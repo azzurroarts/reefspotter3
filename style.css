@@ -75,17 +75,18 @@ select, input {
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
+  height: 400px; /* fixed card height for uniformity */
 }
 
 .species-card img {
   width: 100%;
-  height: auto;
+  height: 180px; /* fixed image height to leave room for text */
   object-fit: contain;
 }
 
 .species-card h2 {
   text-align: center;
-  padding: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem;
   margin: 0;
 }
 
@@ -101,9 +102,8 @@ select, input {
   padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   margin: 0;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* clamp to 3 lines */
-  -webkit-box-orient: vertical;
+  flex-grow: 1; /* take remaining space */
+  display: block;
 }
 
 .species-card.unlocked {
