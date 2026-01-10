@@ -1,142 +1,135 @@
-// script.js
-const speciesGrid = document.getElementById('species-grid');
-const filterSelect = document.getElementById('filter');
-const searchInput = document.getElementById('search');
-const progressBar = document.getElementById('progress-bar');
-const progressText = document.getElementById('progress-text');
-const alphabetContainer = document.getElementById('alphabet');
+document.addEventListener('DOMContentLoaded', () => {
+  const speciesGrid = document.getElementById('species-grid');
+  const searchInput = document.getElementById('search');
+  const filterSelect = document.getElementById('filter');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  const alphabetContainer = document.getElementById('alphabet');
 
-let speciesData = [];
-let unlocked = [];
-let activeLetter = null;
+  let species = [];
+  let unlocked = [];
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const letterRefs = {};
 
-// Load CSV
-fetch('fish.csv')
-  .then((res) => res.text())
-  .then((csvText) => {
-    const lines = csvText.trim().split('\n');
-    const headers = lines.shift().split(',');
-    speciesData = lines.map(line => {
-      const values = line.split(',');
-      return headers.reduce((obj, header, i) => {
-        obj[header] = values[i];
+  // Load CSV
+  fetch('fish.csv')
+    .then(res => res.text())
+    .then(data => {
+      const [headerLine, ...lines] = data.split('\n').filter(l => l.trim() !== '');
+      const headers = headerLine.split(',').map(h => h.trim());
+
+      species = lines.map(line => {
+        const values = line.split(',').map(v => v.trim());
+        const obj = {};
+        headers.forEach((header, i) => obj[header] = values[i] || '');
         return obj;
-      }, {});
-    });
-    renderSpecies();
-    renderAlphabet();
-    updateProgress();
-  });
+      });
 
-function highlightMatch(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${query})`, 'gi');
-  return text.split(regex).map((part, i) =>
-    regex.test(part) ? `<mark>${part}</mark>` : part
-  ).join('');
-}
-
-function renderSpecies() {
-  const filter = filterSelect.value;
-  const searchTerm = searchInput.value.toLowerCase();
-  speciesGrid.innerHTML = '';
-
-  const filtered = speciesData
-    .filter(fish => filter === 'All Species' || fish.location === filter)
-    .filter(fish =>
-      fish.name.toLowerCase().includes(searchTerm) ||
-      (fish.scientific_name?.toLowerCase().includes(searchTerm)) ||
-      (fish.description?.toLowerCase().includes(searchTerm))
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  filtered.forEach(fish => {
-    const cardWrapper = document.createElement('div');
-
-    const card = document.createElement('div');
-    card.className = unlocked.includes(fish.id) ? 'species-card unlocked' : 'species-card locked';
-
-    // Image
-    const img = document.createElement('img');
-    img.src = fish.image_url;
-    img.alt = fish.name;
-    card.appendChild(img);
-
-    // Name
-    const name = document.createElement('h2');
-    name.innerHTML = highlightMatch(fish.name, searchInput.value);
-    name.style.textAlign = 'center';
-    card.appendChild(name);
-
-    // Scientific Name
-    const sciName = document.createElement('p');
-    sciName.innerHTML = fish.scientific_name;
-    sciName.style.fontStyle = 'italic';
-    sciName.style.textAlign = 'center';
-    card.appendChild(sciName);
-
-    // Description with 3-line clamp
-    const desc = document.createElement('p');
-    desc.className = 'description';
-    desc.innerHTML = highlightMatch(fish.description, searchInput.value);
-    card.appendChild(desc);
-
-    // Toggle unlock
-    card.addEventListener('click', () => {
-      if (unlocked.includes(fish.id)) {
-        unlocked = unlocked.filter(id => id !== fish.id);
-      } else {
-        unlocked.push(fish.id);
-      }
       renderSpecies();
+      renderAlphabet();
       updateProgress();
     });
 
-    cardWrapper.appendChild(card);
-    speciesGrid.appendChild(cardWrapper);
-  });
-}
+  function renderSpecies() {
+    const filterValue = filterSelect.value;
+    const searchTerm = searchInput.value.toLowerCase();
 
-function updateProgress() {
-  const total = speciesData.filter(fish =>
-    filterSelect.value === 'All Species' || fish.location === filterSelect.value
-  ).length;
-  const count = unlocked.length;
-  const percent = total ? Math.round((count / total) * 100) : 0;
-  progressBar.style.width = `${percent}%`;
-  progressText.textContent = `${percent}%`;
-}
+    const filtered = species
+      .filter(f => filterValue === 'All Species' || f.location === filterValue)
+      .filter(f =>
+        (f.name && f.name.toLowerCase().includes(searchTerm)) ||
+        (f.scientific_name && f.scientific_name.toLowerCase().includes(searchTerm)) ||
+        (f.description && f.description.toLowerCase().includes(searchTerm))
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-// Alphabet Sidebar
-function renderAlphabet() {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  alphabetContainer.innerHTML = '';
-  alphabet.forEach(letter => {
-    const span = document.createElement('span');
-    span.textContent = letter;
-    span.className = 'alphabet-letter';
-    span.addEventListener('click', () => scrollToLetter(letter));
-    alphabetContainer.appendChild(span);
-  });
-}
+    speciesGrid.innerHTML = '';
 
-function scrollToLetter(letter) {
-  const cards = Array.from(speciesGrid.children);
-  for (let cardWrapper of cards) {
-    const nameEl = cardWrapper.querySelector('h2');
-    if (nameEl && nameEl.textContent.trim().charAt(0).toUpperCase() === letter) {
-      cardWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      break;
-    }
+    filtered.forEach((fish, idx, arr) => {
+      const firstLetter = fish.name.charAt(0).toUpperCase();
+      const prevFirstLetter = idx > 0 ? arr[idx - 1].name.charAt(0).toUpperCase() : null;
+
+      const cardWrapper = document.createElement('div');
+      if (firstLetter !== prevFirstLetter) letterRefs[firstLetter] = cardWrapper;
+
+      const card = document.createElement('div');
+      card.className = unlocked.includes(fish.name) ? 'species-card unlocked' : 'species-card locked';
+
+      // Image
+      if (fish.image_url) {
+        const img = document.createElement('img');
+        img.src = fish.image_url;
+        img.alt = fish.name;
+        card.appendChild(img);
+      }
+
+      // Name
+      if (fish.name) {
+        const nameEl = document.createElement('h2');
+        nameEl.textContent = fish.name;
+        nameEl.style.textAlign = 'center';
+        nameEl.style.padding = '0.5rem';
+        card.appendChild(nameEl);
+      }
+
+      // Scientific name
+      if (fish.scientific_name) {
+        const sciEl = document.createElement('p');
+        sciEl.textContent = fish.scientific_name;
+        sciEl.className = 'italic';
+        sciEl.style.textAlign = 'center';
+        sciEl.style.padding = '0 0.5rem';
+        card.appendChild(sciEl);
+      }
+
+      // Description
+      if (fish.description) {
+        const descEl = document.createElement('p');
+        descEl.textContent = fish.description;
+        descEl.style.textAlign = 'justify';
+        descEl.style.padding = '0 0.5rem 0.5rem 0.5rem';
+        card.appendChild(descEl);
+      }
+
+      card.addEventListener('click', () => {
+        card.classList.toggle('locked');
+        card.classList.toggle('unlocked');
+
+        if (unlocked.includes(fish.name)) {
+          unlocked = unlocked.filter(n => n !== fish.name);
+        } else {
+          unlocked.push(fish.name);
+        }
+        updateProgress();
+      });
+
+      cardWrapper.appendChild(card);
+      speciesGrid.appendChild(cardWrapper);
+    });
   }
-}
 
-filterSelect.addEventListener('change', () => {
-  renderSpecies();
-  updateProgress();
-});
+  function updateProgress() {
+    const total = speciesGrid.children.length;
+    const unlockedCount = unlocked.length;
+    const percent = total ? Math.round((unlockedCount / total) * 100) : 0;
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
+  }
 
-searchInput.addEventListener('input', () => {
-  renderSpecies();
-  updateProgress();
+  function renderAlphabet() {
+    alphabetContainer.innerHTML = '';
+    alphabet.forEach(letter => {
+      const el = document.createElement('span');
+      el.className = 'alphabet-letter';
+      el.textContent = letter;
+      el.addEventListener('click', () => {
+        const ref = letterRefs[letter];
+        if (ref) ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      alphabetContainer.appendChild(el);
+    });
+  }
+
+  searchInput.addEventListener('input', renderSpecies);
+  filterSelect.addEventListener('change', renderSpecies);
 });
