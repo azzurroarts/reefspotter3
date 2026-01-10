@@ -57,11 +57,14 @@ select, input {
   font-weight: bold;
 }
 
+/* Species Cards Grid */
 .species-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
-  padding: 1rem;
+  margin-top: 4rem;
+  padding-right: 3rem; /* space for alphabet */
+  justify-content: start; /* prevents stretching items if fewer in a row */
 }
 
 .species-card {
