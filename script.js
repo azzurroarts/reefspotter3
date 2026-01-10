@@ -34,14 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterValue = filterSelect.value;
     const searchTerm = searchInput.value.toLowerCase();
 
-    const filtered = species
-      .filter(f => filterValue === 'All Species' || f.location === filterValue)
-      .filter(f =>
-        (f.name && f.name.toLowerCase().includes(searchTerm)) ||
-        (f.scientific_name && f.scientific_name.toLowerCase().includes(searchTerm)) ||
-        (f.description && f.description.toLowerCase().includes(searchTerm))
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
+   const filtered = species
+  .filter(f => filterValue === 'All Species' || f.location === filterValue)
+  .filter(f =>
+    (f.name && f.name.toLowerCase().includes(searchTerm)) ||
+    (f.scientific_name && f.scientific_name.toLowerCase().includes(searchTerm)) ||
+    (f.description && f.description.toLowerCase().includes(searchTerm))
+  )
+  .filter(f => f.image_url && f.image_url !== 'UNDEFINED') // <<< skips placeholders
+  .sort((a, b) => a.name.localeCompare(b.name));
 
     speciesGrid.innerHTML = '';
 
