@@ -60,13 +60,14 @@ select, input {
 /* Species Cards Grid */
 .species-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* always 4 per row */
   gap: 1rem;
   margin-top: 4rem;
   padding-right: 3rem; /* space for alphabet */
-  justify-content: start; /* prevents stretching items if fewer in a row */
+  justify-items: stretch; /* items don't stretch weirdly */
 }
 
+/* Individual Card */
 .species-card {
   border: 2px solid black;
   border-radius: 12px;
@@ -75,35 +76,45 @@ select, input {
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  height: 400px; /* fixed card height for uniformity */
+  background: white;
 }
 
+/* Fish Image */
 .species-card img {
   width: 100%;
-  height: 180px; /* fixed image height to leave room for text */
-  object-fit: contain;
+  aspect-ratio: 1 / 1; /* square images, large */
+  object-fit: cover;
 }
 
+/* Text container inside card */
+.species-card .card-text {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  gap: 0.25rem;
+  flex-grow: 1; /* take remaining space below image */
+}
+
+/* Name and scientific name */
 .species-card h2 {
   text-align: center;
-  padding: 0.5rem;
   margin: 0;
 }
 
 .species-card p.scientific-name {
   text-align: center;
   font-style: italic;
-  margin: 0.25rem 0;
-  padding: 0 0.5rem;
+  margin: 0;
 }
 
+/* Description: clamp to ~3 lines */
 .species-card p.description {
   text-align: justify;
-  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   margin: 0;
   overflow: hidden;
-  flex-grow: 1; /* take remaining space */
-  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* limit to 3 lines */
 }
 
 .species-card.unlocked {
