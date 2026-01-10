@@ -15,14 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch('fish.csv')
     .then(res => res.text())
     .then(data => {
-      const lines = data.split('\n').filter(line => line.trim() !== '');
-      const headers = lines[0].split(',');
-      species = lines.slice(1).map(line => {
-        const values = line.split(',');
+      const [headerLine, ...lines] = data.split('\n').filter(l => l.trim() !== '');
+      const headers = headerLine.split(',').map(h => h.trim());
+
+      species = lines.map(line => {
+        const values = line.split(',').map(v => v.trim());
         const obj = {};
-        headers.forEach((header, i) => obj[header.trim()] = values[i] ? values[i].trim() : '');
+        headers.forEach((header, i) => obj[header] = values[i] || '');
         return obj;
       });
+
       renderSpecies();
       renderAlphabet();
       updateProgress();
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nameEl = document.createElement('h2');
         nameEl.textContent = fish.name;
         nameEl.style.textAlign = 'center';
+        nameEl.style.padding = '0.5rem';
         card.appendChild(nameEl);
       }
 
@@ -75,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sciEl.textContent = fish.scientific_name;
         sciEl.className = 'italic';
         sciEl.style.textAlign = 'center';
+        sciEl.style.padding = '0 0.5rem';
         card.appendChild(sciEl);
       }
 
@@ -82,15 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fish.description) {
         const descEl = document.createElement('p');
         descEl.textContent = fish.description;
-        descEl.className = 'description';
         descEl.style.textAlign = 'justify';
-        descEl.style.margin = '0 0.5rem';
+        descEl.style.padding = '0 0.5rem 0.5rem 0.5rem';
         card.appendChild(descEl);
       }
 
       card.addEventListener('click', () => {
         card.classList.toggle('locked');
         card.classList.toggle('unlocked');
+
         if (unlocked.includes(fish.name)) {
           unlocked = unlocked.filter(n => n !== fish.name);
         } else {
@@ -105,4 +109,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateProgress() {
-    const total = specie
+    const total = speciesGrid.children.length;
+    const unlockedCount = unlocked.length;
+    const percent = total ? Math.round((unlockedCount / total) * 100) : 0;
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
+  }
+
+  function renderAlphabet() {
+    alphabetContainer.innerHTML = '';
+    alphabet.forEach(letter => {
+      const el = document.createElement('span');
+      el.className = 'alphabet-letter';
+      el.textContent = letter;
+      el.addEventListener('click', () => {
+        const ref = letterRefs[letter];
+        if (ref) ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      alphabetContainer.appendChild(el);
+    });
+  }
+
+  searchInput.addEventListener('input', renderSpecies);
+  filterSelect.addEventListener('change', renderSpecies);
+});
