@@ -1,6 +1,6 @@
 id,name,scientific_name,description,image_url,location
-1,Clownfish,Amphiprioninae,Small orange and white reef fish,https://via.placeholder.com/300x200.png?text=Clownfish,GBR
-2,Blue Tang,Paracanthurus hepatus,Bright blue reef fish with yellow tail,https://via.placeholder.com/300x200.png?text=Blue+Tang,GBR
-3,Angelfish,Pomacanthidae,Colorful reef fish commonly seen in coral reefs,https://via.placeholder.com/300x200.png?text=Angelfish,GSR
-4,Moorish Idol,Zanclus cornutus,Striking black, white, and yellow striped fish,https://via.placeholder.com/300x200.png?text=Moorish+Idol,GBR
-5,Butterflyfish,Chaetodontidae,Small reef fish with beautiful patterns,https://via.placeholder.com/300x200.png?text=Butterflyfish,GSR
+1,Clownfish,Amphiprioninae,Small orange and white reef fish,https://example.com/clownfish.jpg,GBR
+2,Blue Tang,Paracanthurus hepatus,Bright blue reef fish with yellow tail,https://example.com/clownfish.jpg,GBR
+3,Angelfish,Pomacanthidae,Colorful reef fish commonly seen in coral reefs,https://example.com/clownfish.jpg,GSR
+4,Moorish Idol,Zanclus cornutus,Striking black, white, and yellow striped fish,https://example.com/clownfish.jpg,GBR
+5,Butterflyfish,Chaetodontidae,Small reef fish with beautiful patterns,https://example.com/clownfish.jpg,GSR
