@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReefSpotter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>reefspotter</h1>
+    <div class="controls">
+      <select id="filter">
+        <option value="All Species">All Species</option>
+        <option value="GBR">Great Barrier Reef (GBR)</option>
+        <option value="GSR">Great Southern Reef (GSR)</option>
+      </select>
+      <input type="text" id="search" placeholder="Search species...">
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div id="progress-text">0%</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="species-grid" id="species-grid"></div>
+    <div class="vertical-alphabet" id="alphabet"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
