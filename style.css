@@ -129,7 +129,7 @@ select, input {
 
 .vertical-alphabet {
   position: fixed;
-  top: 5rem;
+  top: 15rem;
   right: 1rem;
   display: flex;
   flex-direction: column;
