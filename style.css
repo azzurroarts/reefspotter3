@@ -8,7 +8,7 @@ body {
 
 .vertical-alphabet {
   position: fixed;
-  top: 30rem; /*push down*/
+  top: 10rem; /*not too far down*/
   right: 1rem;
   display: flex;
   flex-direction: column;
