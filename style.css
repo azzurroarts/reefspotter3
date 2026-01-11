@@ -136,6 +136,7 @@ select, input {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  z-index: 200;
 }
 
 .alphabet-letter {
