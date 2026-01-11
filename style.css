@@ -131,7 +131,7 @@ select, input {
 
 .vertical-alphabet {
   position: fixed !important;
-  top: 70% !important;
+  top: 60% !important;
   right: 1rem !important;
   display: flex !important;
   flex-direction: column !important;
