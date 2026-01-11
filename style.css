@@ -6,33 +6,6 @@ body {
   color: #171717;
 }
 
-.vertical-alphabet {
-  position: fixed;
-  top: 1rem; /*not too far down*/
-  right: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  z-index: 200;
-}
-
-.alphabet-letter {
-  cursor: pointer;
-  font-weight: bold;
-  color: #9ca3af;
-  user-select: none;
-  transition: transform 0.2s;
-}
-
-.alphabet-letter.active {
-  color: white;
-  text-shadow: 0 0 8px rgba(255,255,255,0.9);
-}
-
-.alphabet-letter:hover {
-  transform: scale(1.5);
-}
-
 header {
   position: sticky;
   top: 0;
@@ -156,6 +129,33 @@ select, input {
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
+
+.vertical-alphabet {
+  position: fixed;
+  top: 1rem; /*not too far down*/
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 200;
+}
+
+.alphabet-letter {
+  cursor: pointer;
+  font-weight: bold;
+  color: #9ca3af;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.alphabet-letter.active {
+  color: white;
+  text-shadow: 0 0 8px rgba(255,255,255,0.9);
+}
+
+.alphabet-letter:hover {
+  transform: scale(1.5);
+}
 
 mark {
   background-color: #fde047;
