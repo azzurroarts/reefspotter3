@@ -130,15 +130,16 @@ select, input {
 }
 
 .vertical-alphabet {
-  position: fixed;           /* stay on screen */
-  top: 50%;                  /* center vertically */
-  right: 1rem;               /* distance from right edge */
-  transform: translateY(-50%); /* adjust so 50% is truly center */
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  z-index: 1000;             /* make sure it’s above everything */
+  position: fixed !important;
+  top: 50% !important;
+  right: 1rem !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  z-index: 1000 !important;
 }
+
 
 
 
