@@ -131,14 +131,16 @@ select, input {
 
 
 .vertical-alphabet {
-  position: sticky;
-  top: 20rem; /*not too far down*/
-  right: 1rem;
+  position: fixed;       /* stays on screen */
+  top: 50%;              /* center vertically */
+  right: 3rem;           /* distance from right edge */
+  transform: translateY(-50%);  /* actually center by offsetting half height */
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  z-index: 200;
+  z-index: 1000;         /* make sure it’s above everything */
 }
+
 
 .alphabet-letter {
   cursor: pointer;
@@ -149,12 +151,12 @@ select, input {
 }
 
 .alphabet-letter.active {
-  color: white;
+  color: pink;
   text-shadow: 0 0 8px rgba(255,255,255,0.9);
 }
 
 .alphabet-letter:hover {
-  transform: scale(1.5);
+  transform: scale(2);
 }
 
 mark {
