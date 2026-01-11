@@ -65,15 +65,23 @@ select, input {
   font-weight: bold;
 }
 
-/* Species Cards Grid */
+/* Default: 4 per row */
 .species-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* always 4 per row */
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 4rem;
-  padding-right: 3rem; /* space for alphabet */
-  justify-items: stretch; /* items don't stretch weirdly */
+  padding-right: 3rem;
+  justify-items: stretch;
 }
+
+/* Mobile: 1 per row */
+@media (max-width: 640px) {
+  .species-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 /* Individual Card */
 .species-card {
