@@ -128,17 +128,17 @@ select, input {
   transform: scale(0.95);
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
-
-..vertical-alphabet {
-  position: fixed;       /* always relative to viewport */
-  top: 60vh !important;  /* 60% down the screen, !important to override anything */
-  right: 1rem !important; /* distance from right edge */
+.vertical-alphabet {
+  position: fixed;           /* stays on screen */
+  top: 60%;                  /* ~3/5 down viewport */
+  right: 1rem;               /* distance from right edge */
+  transform: translateY(-50%); /* truly center around top point */
   display: flex;
-  flex-direction: column;
+  flex-direction: column;    /* vertical letters */
   gap: 0.2rem;
-  z-index: 10000;       /* way above everything */
-  transform: translateY(-50%); /* vertically center on that 60% line */
+  z-index: 1000;             /* above everything */
 }
+
 
 
 .alphabet-letter {
