@@ -133,8 +133,8 @@ select, input {
 .vertical-alphabet {
   position: fixed;       /* stays on screen */
   top: 15rem;              /* center vertically */
-  right: 1.5rem;           /* distance from right edge */
-  transform: translateY(-50%);  /* actually center by offsetting half height */
+  right: 1rem;           /* distance from right edge */
+  /* transform: translateY(-50%);  /* actually center by offsetting half height */
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
