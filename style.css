@@ -129,17 +129,17 @@ select, input {
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
-
 .vertical-alphabet {
-  position: fixed;       /* stays on screen */
-  top: 15rem;              /* center vertically */
-  right: 1rem;           /* distance from right edge */
-  /* transform: translateY(-50%);  /* actually center by offsetting half height */
+  position: fixed;           /* stay on screen */
+  top: 50%;                  /* center vertically */
+  right: 1rem;               /* distance from right edge */
+  transform: translateY(-50%); /* adjust so 50% is truly center */
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  z-index: 1000;         /* make sure it’s above everything */
+  z-index: 1000;             /* make sure it’s above everything */
 }
+
 
 
 .alphabet-letter {
