@@ -129,17 +129,16 @@ select, input {
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
-.vertical-alphabet {
-  position: fixed !important;
-  top: 60vh !important;
-  right: 1rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.2rem !important;
-  z-index: 1000 !important;
+..vertical-alphabet {
+  position: fixed;       /* always relative to viewport */
+  top: 60vh !important;  /* 60% down the screen, !important to override anything */
+  right: 1rem !important; /* distance from right edge */
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 10000;       /* way above everything */
+  transform: translateY(-50%); /* vertically center on that 60% line */
 }
-
-
 
 
 .alphabet-letter {
