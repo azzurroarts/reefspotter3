@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Image
       if (fish.image_url) {
         const img = document.createElement('img');
-        img.src = fish.image_url;
+        img.src = `/reefspotter/images/${encodeURIComponent(f.image_url)}`;
         img.alt = fish.name;
         card.appendChild(img);
       }
