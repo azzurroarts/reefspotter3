@@ -12,23 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const letterRefs = {};
 
   // Load CSV
-  fetch('fish.csv')
-    .then(res => res.text())
-    .then(data => {
-      const [headerLine, ...lines] = data.split('\n').filter(l => l.trim() !== '');
-      const headers = headerLine.split(',').map(h => h.trim());
-
-      species = lines.map(line => {
-        const values = line.split(',').map(v => v.trim());
-        const obj = {};
-        headers.forEach((header, i) => obj[header] = values[i] || '');
-        return obj;
-      });
-
-      renderSpecies();
-      renderAlphabet();
-      updateProgress();
+ fetch('fish.csv')
+  .then(response => response.text())
+  .then(text => {
+    const lines = text.split('\n');
+    const headers = lines[0].split(',');
+    species = lines.slice(1).map(line => {
+      const values = line.split(',');
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = values[i]);
+      return obj;
     });
+
+    renderSpecies();
+    renderAlphabet();
+    updateProgress();
+  });
+
 
   function renderSpecies() {
     const filterValue = filterSelect.value;
