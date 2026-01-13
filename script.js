@@ -178,7 +178,7 @@ const filename = rawFilename
       const img = document.createElement('img');
 
       if (filename) {
-        img.src = `/reefspotter/images/${encodeURIComponent(filename)}`;
+      img.src = `/reefspotter/images/${filename}`;
       } else {
         // If missing, point to placeholder so the card still shows
         img.src = '/reefspotter/images/placeholder.png';
