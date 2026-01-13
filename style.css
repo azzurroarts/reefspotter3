@@ -130,7 +130,7 @@ select, input {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* limit to 3 lines */
+  -webkit-line-clamp: 5; /* limit to 3 lines */
 }
 
 .species-card.unlocked {
