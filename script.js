@@ -76,45 +76,60 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadCSV() {
-    // This relative path is safest when your site is already /reefspotter/
-    fetch('fish.csv')
-      .then(res => {
-        if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
-        return res.text();
-      })
-      .then(text => {
-        // Handle BOM at very start of file too
-        text = text.replace(/^\uFEFF/, '');
+  fetch('fish.csv')
+    .then(res => {
+      if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
+      return res.text();
+    })
+    .then(text => {
+      text = text.replace(/^\uFEFF/, ''); // strip BOM
 
-        const rows = parseCSV(text);
-        if (!rows.length) throw new Error('fish.csv is empty or unreadable');
+      const rows = parseCSV(text);
 
-        const headers = rows[0].map(normalizeHeader);
-        const dataRows = rows.slice(1);
+      // 🔴 DEBUG OUTPUT ON PAGE
+      speciesGrid.innerHTML = `
+        <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
+          <strong>DEBUG:</strong><br>
+          Rows parsed: ${rows.length}<br>
+          First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
+        </div>
+      `;
 
-        species = dataRows.map(cols => {
-          const obj = {};
-          headers.forEach((h, i) => (obj[h] = (cols[i] ?? '').trim()));
-          return obj;
+      if (!rows.length) throw new Error('No rows parsed from CSV');
+
+      const headers = rows[0].map(h =>
+        h.replace(/^\uFEFF/, '').trim().toLowerCase()
+      );
+
+      species = rows.slice(1).map(cols => {
+        const obj = {};
+        headers.forEach((h, i) => {
+          obj[h] = (cols[i] ?? '').trim();
         });
-
-        // Debug sanity checks
-        console.log('[reefspotter] headers:', headers);
-        console.log('[reefspotter] first row:', species[0]);
-
-        renderSpecies();
-        renderAlphabet();
-        updateProgress();
-      })
-      .catch(err => {
-        console.error('[reefspotter] load error:', err);
-        speciesGrid.innerHTML = `
-          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
-            <strong>Couldn’t load/parse fish.csv:</strong> ${String(err.message || err)}
-            <div style="margin-top:.5rem;">Open DevTools → Console for details.</div>
-          </div>`;
+        return obj;
       });
-  }
+
+      // 🔴 MORE DEBUG
+      speciesGrid.innerHTML += `
+        <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
+          Species objects created: ${species.length}<br>
+          First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
+        </div>
+      `;
+
+      renderSpecies();
+      renderAlphabet();
+      updateProgress();
+    })
+    .catch(err => {
+      speciesGrid.innerHTML = `
+        <div style="padding:1rem;border:2px solid red;border-radius:12px;margin:1rem;">
+          CSV ERROR: ${err.message}
+        </div>
+      `;
+    });
+}
+
 
   function renderSpecies() {
     speciesGrid.innerHTML = '';
