@@ -7,114 +7,196 @@ document.addEventListener('DOMContentLoaded', () => {
   const alphabetContainer = document.getElementById('alphabet');
 
   let species = [];
-  let unlocked = [];
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const letterRefs = {};
 
-  // Load CSV
- fetch('fish.csv')
-  .then(response => response.text())
-  .then(text => {
-    const lines = text.split('\n');
-    const headers = lines[0].split(',');
-    species = lines.slice(1).map(line => {
-      const values = line.split(',');
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = values[i]);
-      return obj;
-    });
+  // Robust CSV parser: quoted fields, commas in quotes, escaped quotes ("")
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
 
-    renderSpecies();
-    renderAlphabet();
-    updateProgress();
-  });
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
 
-
-  function renderSpecies() {
-    const filterValue = filterSelect.value;
-    const searchTerm = searchInput.value.toLowerCase();
-
-   const filtered = species
-  .filter(f => filterValue === 'All Species' || f.location === filterValue)
-  .filter(f =>
-    (f.name && f.name.toLowerCase().includes(searchTerm)) ||
-    (f.scientific_name && f.scientific_name.toLowerCase().includes(searchTerm)) ||
-    (f.description && f.description.toLowerCase().includes(searchTerm))
-  )
-  .filter(f => f.image_url && f.image_url !== 'UNDEFINED') // <<< skips placeholders
-  .sort((a, b) => a.name.localeCompare(b.name));
-
-    speciesGrid.innerHTML = '';
-
-    filtered.forEach((fish, idx, arr) => {
-      const firstLetter = fish.name.charAt(0).toUpperCase();
-      const prevFirstLetter = idx > 0 ? arr[idx - 1].name.charAt(0).toUpperCase() : null;
-
-      const cardWrapper = document.createElement('div');
-      if (firstLetter !== prevFirstLetter) letterRefs[firstLetter] = cardWrapper;
-
-      const card = document.createElement('div');
-      card.className = unlocked.includes(fish.name) ? 'species-card unlocked' : 'species-card locked';
-
-      // Image
-      if (fish.image_url) {
-        const img = document.createElement('img');
-        img.src = `/reefspotter/images/${encodeURIComponent(f.image_url)}`;
-        img.alt = fish.name;
-        card.appendChild(img);
-      }
-
-      // Name
-      if (fish.name) {
-        const nameEl = document.createElement('h2');
-        nameEl.textContent = fish.name;
-        nameEl.style.textAlign = 'center';
-        nameEl.style.padding = '0.5rem';
-        card.appendChild(nameEl);
-      }
-
-      // Scientific name
-      if (fish.scientific_name) {
-        const sciEl = document.createElement('p');
-        sciEl.textContent = fish.scientific_name;
-        sciEl.className = 'italic';
-        sciEl.style.textAlign = 'center';
-        sciEl.style.padding = '0 0.5rem';
-        card.appendChild(sciEl);
-      }
-
-      // Description
-      if (fish.description) {
-        const descEl = document.createElement('p');
-        descEl.textContent = fish.description;
-        descEl.style.textAlign = 'justify';
-        descEl.style.padding = '0 0.5rem 0.5rem 0.5rem';
-        card.appendChild(descEl);
-      }
-
-      card.addEventListener('click', () => {
-        card.classList.toggle('locked');
-        card.classList.toggle('unlocked');
-
-        if (unlocked.includes(fish.name)) {
-          unlocked = unlocked.filter(n => n !== fish.name);
+      if (c === '"') {
+        if (inQuotes && next === '"') {
+          field += '"';
+          i++;
         } else {
-          unlocked.push(fish.name);
+          inQuotes = !inQuotes;
         }
-        updateProgress();
-      });
+        continue;
+      }
 
-      cardWrapper.appendChild(card);
-      speciesGrid.appendChild(cardWrapper);
-    });
+      if (c === ',' && !inQuotes) {
+        row.push(field);
+        field = '';
+        continue;
+      }
+
+      if ((c === '\n' || c === '\r') && !inQuotes) {
+        if (c === '\r' && next === '\n') i++;
+        row.push(field);
+        field = '';
+        if (row.some(cell => cell.trim() !== '')) rows.push(row);
+        row = [];
+        continue;
+      }
+
+      field += c;
+    }
+
+    if (field.length || row.length) {
+      row.push(field);
+      if (row.some(cell => cell.trim() !== '')) rows.push(row);
+    }
+
+    return rows;
   }
 
-  function updateProgress() {
-    const total = speciesGrid.children.length;
-    const unlockedCount = unlocked.length;
-    const percent = total ? Math.round((unlockedCount / total) * 100) : 0;
-    progressBar.style.width = `${percent}%`;
-    progressText.textContent = `${percent}%`;
+  function normalizeHeader(h) {
+    return (h || '')
+      .replace(/^\uFEFF/, '') // strip BOM if present
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_');
+  }
+
+  // Pick the first existing key from a list of possibilities
+  function pick(obj, keys, fallback = '') {
+    for (const k of keys) {
+      if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') {
+        return String(obj[k]).trim();
+      }
+    }
+    return fallback;
+  }
+
+  function loadCSV() {
+    // This relative path is safest when your site is already /reefspotter/
+    fetch('fish.csv')
+      .then(res => {
+        if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
+        return res.text();
+      })
+      .then(text => {
+        // Handle BOM at very start of file too
+        text = text.replace(/^\uFEFF/, '');
+
+        const rows = parseCSV(text);
+        if (!rows.length) throw new Error('fish.csv is empty or unreadable');
+
+        const headers = rows[0].map(normalizeHeader);
+        const dataRows = rows.slice(1);
+
+        species = dataRows.map(cols => {
+          const obj = {};
+          headers.forEach((h, i) => (obj[h] = (cols[i] ?? '').trim()));
+          return obj;
+        });
+
+        // Debug sanity checks
+        console.log('[reefspotter] headers:', headers);
+        console.log('[reefspotter] first row:', species[0]);
+
+        renderSpecies();
+        renderAlphabet();
+        updateProgress();
+      })
+      .catch(err => {
+        console.error('[reefspotter] load error:', err);
+        speciesGrid.innerHTML = `
+          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
+            <strong>Couldn’t load/parse fish.csv:</strong> ${String(err.message || err)}
+            <div style="margin-top:.5rem;">Open DevTools → Console for details.</div>
+          </div>`;
+      });
+  }
+
+  function renderSpecies() {
+    speciesGrid.innerHTML = '';
+    for (const k of Object.keys(letterRefs)) delete letterRefs[k];
+
+    const query = (searchInput.value || '').trim().toLowerCase();
+    const filter = filterSelect.value; // "All Species" or GBR/GSR/etc
+
+    const filtered = species
+      .filter(f => {
+        // Flexible location field names
+        const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
+        if (filter === 'All Species') return true;
+        return loc === filter;
+      })
+      .filter(f => {
+        const name = pick(f, ['name', 'common_name', 'title'], '').toLowerCase();
+        const sci  = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
+        return name.includes(query) || sci.includes(query);
+      })
+      .sort((a, b) => {
+        const an = pick(a, ['name', 'common_name', 'title'], '');
+        const bn = pick(b, ['name', 'common_name', 'title'], '');
+        return an.localeCompare(bn);
+      });
+
+    filtered.forEach(f => {
+      const name = pick(f, ['name', 'common_name', 'title'], '');
+      const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '');
+      const desc = pick(f, ['description', 'desc', 'blurb'], '');
+
+      // image filename (not URL)
+      const filename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
+
+      const card = document.createElement('div');
+      card.className = 'species-card unlocked';
+
+      const img = document.createElement('img');
+
+      if (filename) {
+        img.src = `/reefspotter/images/${encodeURIComponent(filename)}`;
+      } else {
+        // If missing, point to placeholder so the card still shows
+        img.src = '/reefspotter/images/placeholder.png';
+      }
+
+      img.alt = name || 'Species image';
+      img.onerror = () => {
+        img.src = '/reefspotter/images/placeholder.png';
+        img.alt = `${name || 'Species'} (image missing)`;
+      };
+
+      const text = document.createElement('div');
+      text.className = 'card-text';
+
+      const nameEl = document.createElement('h2');
+      nameEl.textContent = name;
+
+      const sciEl = document.createElement('p');
+      sciEl.className = 'scientific-name';
+      sciEl.textContent = sci;
+
+      const descEl = document.createElement('p');
+      descEl.className = 'description';
+      descEl.textContent = desc;
+
+      text.append(nameEl, sciEl, descEl);
+      card.append(img, text);
+      speciesGrid.appendChild(card);
+
+      const firstLetter = (name[0] || '').toUpperCase();
+      if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
+    });
+
+    updateProgress(filtered.length);
+  }
+
+  function updateProgress(visibleCount = species.length) {
+    const total = species.length || 0;
+    const pct = total ? Math.round((visibleCount / total) * 100) : 0;
+    progressBar.style.width = `${pct}%`;
+    progressText.textContent = `${pct}%`;
   }
 
   function renderAlphabet() {
@@ -133,4 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
+
+  loadCSV();
 });
