@@ -162,7 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const desc = pick(f, ['description', 'desc', 'blurb'], '');
 
       // image filename (not URL)
-      const filename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
+      const filename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '')
+  .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
+  .trim();
+
 
       const card = document.createElement('div');
       card.className = 'species-card unlocked';
