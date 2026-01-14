@@ -114,9 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
           return obj;
         });
 
-        renderSpecies();
-        renderAlphabet();
-        updateProgress();
+        setMode('discovery');
+renderAlphabet();
       })
       .catch(err => {
         speciesGrid.innerHTML = `
