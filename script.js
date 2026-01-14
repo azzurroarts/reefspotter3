@@ -89,6 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return raw && v !== 'undefined' && v !== 'null';
   }
 
+  
+function setMode(nextMode) {
+  MODE = nextMode;
+
+  const modeLabel = document.getElementById('mode-label');
+  const modeToggle = document.getElementById('mode-toggle');
+
+  if (modeLabel) modeLabel.textContent = MODE;
+  if (modeToggle) {
+    modeToggle.textContent = MODE === 'discovery' ? 'catalogue' : 'discovery';
+  }
+
+  renderSpecies();
+  updateProgress();
+}
+
   // =========================
   // CSV load (UNCHANGED except final call)
   // =========================
@@ -270,6 +286,10 @@ renderAlphabet();
   // =========================
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
+document.getElementById('mode-toggle')
+  .addEventListener('click', () => {
+    setMode(MODE === 'discovery' ? 'catalogue' : 'discovery');
+  });
 
   loadCSV();
 });
