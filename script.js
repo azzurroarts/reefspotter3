@@ -156,11 +156,16 @@ renderAlphabet();
 
     const filtered = species
       .filter(f => {
-        if (MODE === 'catalogue') return true; // ADDED
-        const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
-        if (filter === 'All Species') return true;
-        return loc === filter;
-      })
+  if (MODE === 'catalogue') return true;
+
+  // Discovery: hide undrawn fish
+  if (!isIllustrated(f)) return false;
+
+  const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
+  if (filter === 'All Species') return true;
+  return loc === filter;
+})
+
       .filter(f => {
         const name = pick(f, ['name', 'common_name', 'title'], '').toLowerCase();
         const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
@@ -189,6 +194,8 @@ renderAlphabet();
 
       const card = document.createElement('div');
       card.className = 'species-card';
+      card.classList.remove('locked', 'unlocked');
+
 
       // ADDED: lock/unlock logic
       if (MODE === 'catalogue') {
