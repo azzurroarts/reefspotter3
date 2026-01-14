@@ -95,17 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
 function setMode(nextMode) {
   MODE = nextMode;
 
-  const modeLabel = document.getElementById('mode-label');
   const modeToggle = document.getElementById('mode-toggle');
+  const modeLabel = document.getElementById('mode-label');
 
-  if (modeLabel) modeLabel.textContent = MODE;
+  // Pill shows CURRENT mode (source of truth)
   if (modeToggle) {
-    modeToggle.textContent = MODE === 'discovery' ? 'catalogue' : 'discovery';
+    modeToggle.textContent = MODE;
+  }
+
+  // Optional helper text (can delete later if annoying)
+  if (modeLabel) {
+    modeLabel.textContent =
+      MODE === 'discovery'
+        ? 'discovery'
+        : 'catalogue';
   }
 
   renderSpecies();
   updateProgress();
 }
+
 
   // =========================
   // CSV load (UNCHANGED except final call)
@@ -194,7 +203,7 @@ renderAlphabet();
 
       const card = document.createElement('div');
       card.className = 'species-card';
-      card.classList.remove('locked', 'unlocked');
+card.classList.remove('locked', 'unlocked');
 
 
       // ADDED: lock/unlock logic
@@ -299,6 +308,7 @@ document.getElementById('mode-toggle')
   .addEventListener('click', () => {
     setMode(MODE === 'discovery' ? 'catalogue' : 'discovery');
   });
+
 
   loadCSV();
 });
