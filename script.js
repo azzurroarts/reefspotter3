@@ -57,14 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return rows;
   }
 
-  function normalizeHeader(h) {
-    return (h || '')
-      .replace(/^\uFEFF/, '') // strip BOM if present
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '_');
-  }
-
   // Pick the first existing key from a list of possibilities
   function pick(obj, keys, fallback = '') {
     for (const k of keys) {
@@ -76,62 +68,59 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadCSV() {
-  fetch('fish.csv')
-    .then(res => {
-      if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
-      return res.text();
-    })
-    .then(text => {
-      text = text.replace(/^\uFEFF/, ''); // strip BOM
+    fetch('fish.csv')
+      .then(res => {
+        if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
+        return res.text();
+      })
+      .then(text => {
+        text = text.replace(/^\uFEFF/, ''); // strip BOM
 
-      const rows = parseCSV(text);
+        const rows = parseCSV(text);
 
-      // 🔴 DEBUG OUTPUT ON PAGE
-      speciesGrid.innerHTML = `
-        <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
-          <strong>DEBUG:</strong><br>
-          Rows parsed: ${rows.length}<br>
-          First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
-        </div>
-      `;
+        // 🔴 DEBUG OUTPUT ON PAGE (optional; remove later)
+        speciesGrid.innerHTML = `
+          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
+            <strong>DEBUG:</strong><br>
+            Rows parsed: ${rows.length}<br>
+            First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
+          </div>
+        `;
 
-      if (!rows.length) throw new Error('No rows parsed from CSV');
+        if (!rows.length) throw new Error('No rows parsed from CSV');
 
-      const headers = rows[0].map(h =>
-        h.replace(/^\uFEFF/, '').trim().toLowerCase()
-      );
-
-      species = rows.slice(1).map(cols => {
-        const obj = {};
-        headers.forEach((h, i) => {
-          obj[h] = (cols[i] ?? '').trim();
+        const headers = rows[0].map(h => h.replace(/^\uFEFF/, '').trim().toLowerCase());
+        species = rows.slice(1).map(cols => {
+          const obj = {};
+          headers.forEach((h, i) => {
+            obj[h] = (cols[i] ?? '').trim();
+          });
+          return obj;
         });
-        return obj;
+
+        // 🔴 MORE DEBUG (optional; remove later)
+        speciesGrid.innerHTML += `
+          <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
+            Species objects created: ${species.length}<br>
+            First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
+          </div>
+        `;
+
+        renderSpecies();
+        renderAlphabet();
+        updateProgress();
+      })
+      .catch(err => {
+        speciesGrid.innerHTML = `
+          <div style="padding:1rem;border:2px solid red;border-radius:12px;margin:1rem;">
+            CSV ERROR: ${err.message}
+          </div>
+        `;
       });
-
-      // 🔴 MORE DEBUG
-      speciesGrid.innerHTML += `
-        <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
-          Species objects created: ${species.length}<br>
-          First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
-        </div>
-      `;
-
-      renderSpecies();
-      renderAlphabet();
-      updateProgress();
-    })
-    .catch(err => {
-      speciesGrid.innerHTML = `
-        <div style="padding:1rem;border:2px solid red;border-radius:12px;margin:1rem;">
-          CSV ERROR: ${err.message}
-        </div>
-      `;
-    });
-}
-
+  }
 
   function renderSpecies() {
+    // Clear grid (this will remove the debug boxes once it renders cards)
     speciesGrid.innerHTML = '';
     for (const k of Object.keys(letterRefs)) delete letterRefs[k];
 
@@ -140,14 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const filtered = species
       .filter(f => {
-        // Flexible location field names
         const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
         if (filter === 'All Species') return true;
         return loc === filter;
       })
       .filter(f => {
         const name = pick(f, ['name', 'common_name', 'title'], '').toLowerCase();
-        const sci  = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
+        const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
         return name.includes(query) || sci.includes(query);
       })
       .sort((a, b) => {
@@ -164,32 +152,30 @@ document.addEventListener('DOMContentLoaded', () => {
       // image filename (not URL)
       const rawFilename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
 
-const filename = rawFilename
-  .normalize('NFKD')
-  .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
-  .replace(/\s+/g, '')
-  .trim();
-
-
+      const filename = rawFilename
+        .normalize('NFKD')
+        .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
+        .replace(/\s+/g, '')
+        .trim();
 
       const card = document.createElement('div');
       card.className = 'species-card unlocked';
 
-    const img = document.createElement('img');
+      const img = document.createElement('img');
 
-if (filename) {
-  img.src = `/reefspotter3/images/${filename}`;
-} else {
-  img.src = '/reefspotter/images/placeholder.png';
-}
+      if (filename) {
+        img.src = `/reefspotter3/images/${filename}`;
+      } else {
+        // If no filename, just don't break the layout
+        img.removeAttribute('src');
+      }
 
-img.alt = name || 'Species image';
+      img.alt = name || 'Species image';
 
-
-  `;
-  img.replaceWith(debug);
-};
-
+      // If image fails, hide it (no placeholder file needed)
+      img.onerror = () => {
+        img.style.display = 'none';
+      };
 
       const text = document.createElement('div');
       text.className = 'card-text';
