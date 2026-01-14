@@ -6,11 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressText = document.getElementById('progress-text');
   const alphabetContainer = document.getElementById('alphabet');
 
+  // =========================
+  // ADDED: Discovery / Mode state
+  // =========================
+  const STORAGE_KEY = 'reefspotter3_discovered';
+  let MODE = 'discovery'; // default user-facing
+  let discoveredSet = new Set(
+    JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+  );
+
   let species = [];
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const letterRefs = {};
 
-  // Robust CSV parser: quoted fields, commas in quotes, escaped quotes ("")
+  // =========================
+  // Robust CSV parser (UNCHANGED)
+  // =========================
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -57,7 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return rows;
   }
 
-  // Pick the first existing key from a list of possibilities
+  // =========================
+  // Pick helper (UNCHANGED)
+  // =========================
   function pick(obj, keys, fallback = '') {
     for (const k of keys) {
       if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') {
@@ -67,6 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return fallback;
   }
 
+  // =========================
+  // ADDED: illustrated check
+  // =========================
+  function isIllustrated(f) {
+    const raw = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
+    const v = raw.toLowerCase();
+    return raw && v !== 'undefined' && v !== 'null';
+  }
+
+  // =========================
+  // CSV load (UNCHANGED except final call)
+  // =========================
   function loadCSV() {
     fetch('fish.csv')
       .then(res => {
@@ -74,18 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.text();
       })
       .then(text => {
-        text = text.replace(/^\uFEFF/, ''); // strip BOM
+        text = text.replace(/^\uFEFF/, '');
 
         const rows = parseCSV(text);
-
-        // 🔴 DEBUG OUTPUT ON PAGE (optional; remove later)
-        speciesGrid.innerHTML = `
-          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
-            <strong>DEBUG:</strong><br>
-            Rows parsed: ${rows.length}<br>
-            First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
-          </div>
-        `;
 
         if (!rows.length) throw new Error('No rows parsed from CSV');
 
@@ -97,14 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           return obj;
         });
-
-        // 🔴 MORE DEBUG (optional; remove later)
-        speciesGrid.innerHTML += `
-          <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
-            Species objects created: ${species.length}<br>
-            First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
-          </div>
-        `;
 
         renderSpecies();
         renderAlphabet();
@@ -119,16 +127,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  // =========================
+  // renderSpecies (CHANGED surgically)
+  // =========================
   function renderSpecies() {
-    // Clear grid (this will remove the debug boxes once it renders cards)
     speciesGrid.innerHTML = '';
     for (const k of Object.keys(letterRefs)) delete letterRefs[k];
 
     const query = (searchInput.value || '').trim().toLowerCase();
-    const filter = filterSelect.value; // "All Species" or GBR/GSR/etc
+    const filter = filterSelect.value;
 
     const filtered = species
       .filter(f => {
+        if (MODE === 'catalogue') return true; // ADDED
         const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
         if (filter === 'All Species') return true;
         return loc === filter;
@@ -149,33 +160,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '');
       const desc = pick(f, ['description', 'desc', 'blurb'], '');
 
-      // image filename (not URL)
       const rawFilename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
-
       const filename = rawFilename
         .normalize('NFKD')
         .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
         .replace(/\s+/g, '')
         .trim();
 
+      const illustrated = isIllustrated(f);
+      const discovered = discoveredSet.has(name);
+
       const card = document.createElement('div');
-      card.className = 'species-card unlocked';
+      card.className = 'species-card';
+
+      // ADDED: lock/unlock logic
+      if (MODE === 'catalogue') {
+        card.classList.add(illustrated ? 'unlocked' : 'locked');
+      } else {
+        if (!illustrated) card.classList.add('locked');
+        else card.classList.add(discovered ? 'unlocked' : 'locked');
+      }
 
       const img = document.createElement('img');
 
       if (filename) {
         img.src = `/reefspotter3/images/${filename}`;
       } else {
-        // If no filename, just don't break the layout
         img.removeAttribute('src');
       }
 
       img.alt = name || 'Species image';
-
-      // If image fails, hide it (no placeholder file needed)
-      img.onerror = () => {
-        img.style.display = 'none';
-      };
+      img.onerror = () => (img.style.display = 'none');
 
       const text = document.createElement('div');
       text.className = 'card-text';
@@ -195,20 +210,48 @@ document.addEventListener('DOMContentLoaded', () => {
       card.append(img, text);
       speciesGrid.appendChild(card);
 
+      // ADDED: click-to-discover
+      card.addEventListener('click', () => {
+        if (MODE !== 'discovery') return;
+        if (!illustrated) return;
+        if (!discovered) {
+          discoveredSet.add(name);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([...discoveredSet]));
+          renderSpecies();
+        }
+      });
+
       const firstLetter = (name[0] || '').toUpperCase();
       if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
     });
 
-    updateProgress(filtered.length);
+    updateProgress();
   }
 
-  function updateProgress(visibleCount = species.length) {
-    const total = species.length || 0;
-    const pct = total ? Math.round((visibleCount / total) * 100) : 0;
+  // =========================
+  // updateProgress (CHANGED)
+  // =========================
+  function updateProgress() {
+    const total = species.length;
+    const illustrated = species.filter(isIllustrated);
+    const discoveredIllustrated = illustrated.filter(f =>
+      discoveredSet.has(pick(f, ['name'], ''))
+    );
+
+    const pct =
+      MODE === 'catalogue'
+        ? total ? (illustrated.length / total) * 100 : 0
+        : illustrated.length
+        ? (discoveredIllustrated.length / illustrated.length) * 100
+        : 0;
+
     progressBar.style.width = `${pct}%`;
-    progressText.textContent = `${pct}%`;
+    progressText.textContent = `${Math.round(pct)}%`;
   }
 
+  // =========================
+  // renderAlphabet (UNCHANGED)
+  // =========================
   function renderAlphabet() {
     alphabetContainer.innerHTML = '';
     alphabet.forEach(letter => {
@@ -223,6 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================
+  // Listeners (UNCHANGED)
+  // =========================
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
 
