@@ -199,7 +199,6 @@ renderAlphabet();
         .trim();
 
       const illustrated = isIllustrated(f);
-      const discovered = discoveredSet.has(name);
 
       const card = document.createElement('div');
       card.className = 'species-card';
@@ -241,25 +240,34 @@ card.classList.remove('locked', 'unlocked');
 
       text.append(nameEl, sciEl, descEl);
       card.append(img, text);
-      speciesGrid.appendChild(card);
+    speciesGrid.appendChild(card);
 
-      // ADDED: click-to-discover
-      card.addEventListener('click', () => {
-        if (MODE !== 'discovery') return;
-        if (!illustrated) return;
-        if (!discovered) {
-          discoveredSet.add(name);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify([...discoveredSet]));
-          renderSpecies();
-        }
-      });
+// CLICK-TO-DISCOVER (TOGGLE, LIVE STATE)
+card.addEventListener('click', () => {
+  if (MODE !== 'discovery') return;
+  if (!illustrated) return;
 
-      const firstLetter = (name[0] || '').toUpperCase();
-      if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
-    });
-
-    updateProgress();
+  if (discoveredSet.has(name)) {
+    discoveredSet.delete(name);
+  } else {
+    discoveredSet.add(name);
   }
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify([...discoveredSet])
+  );
+
+  renderSpecies();
+});
+
+const firstLetter = (name[0] || '').toUpperCase();
+if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
+});
+
+updateProgress();
+}
+
 
   // =========================
   // updateProgress (CHANGED)
