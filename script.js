@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  localStorage.removeItem('reefspotter3_discovered');
-
   const speciesGrid = document.getElementById('species-grid');
   const searchInput = document.getElementById('search');
   const filterSelect = document.getElementById('filter');
@@ -8,22 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressText = document.getElementById('progress-text');
   const alphabetContainer = document.getElementById('alphabet');
 
-  // =========================
-  // ADDED: Discovery / Mode state
-  // =========================
-  const STORAGE_KEY = 'reefspotter3_discovered';
-  let MODE = 'discovery'; // default user-facing
-  let discoveredSet = new Set(
-    JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  );
-
   let species = [];
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const letterRefs = {};
 
-  // =========================
-  // Robust CSV parser (UNCHANGED)
-  // =========================
+  // Robust CSV parser: quoted fields, commas in quotes, escaped quotes ("")
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -70,9 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return rows;
   }
 
-  // =========================
-  // Pick helper (UNCHANGED)
-  // =========================
+  // Pick the first existing key from a list of possibilities
   function pick(obj, keys, fallback = '') {
     for (const k of keys) {
       if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') {
@@ -82,43 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return fallback;
   }
 
-  // =========================
-  // ADDED: illustrated check
-  // =========================
-  function isIllustrated(f) {
-    const raw = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
-    const v = raw.toLowerCase();
-    return raw && v !== 'undefined' && v !== 'null';
-  }
-
-  
-function setMode(nextMode) {
-  MODE = nextMode;
-
-  const modeToggle = document.getElementById('mode-toggle');
-  const modeLabel = document.getElementById('mode-label');
-
-  // Pill shows CURRENT mode (source of truth)
-  if (modeToggle) {
-    modeToggle.textContent = MODE;
-  }
-
-  // Optional helper text (can delete later if annoying)
-  if (modeLabel) {
-    modeLabel.textContent =
-      MODE === 'discovery'
-        ? 'discovery'
-        : 'catalogue';
-  }
-
-  renderSpecies();
-  updateProgress();
-}
-
-
-  // =========================
-  // CSV load (UNCHANGED except final call)
-  // =========================
   function loadCSV() {
     fetch('fish.csv')
       .then(res => {
@@ -126,9 +74,18 @@ function setMode(nextMode) {
         return res.text();
       })
       .then(text => {
-        text = text.replace(/^\uFEFF/, '');
+        text = text.replace(/^\uFEFF/, ''); // strip BOM
 
         const rows = parseCSV(text);
+
+        // 🔴 DEBUG OUTPUT ON PAGE (optional; remove later)
+        speciesGrid.innerHTML = `
+          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
+            <strong>DEBUG:</strong><br>
+            Rows parsed: ${rows.length}<br>
+            First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
+          </div>
+        `;
 
         if (!rows.length) throw new Error('No rows parsed from CSV');
 
@@ -141,8 +98,17 @@ function setMode(nextMode) {
           return obj;
         });
 
-        setMode('discovery');
-renderAlphabet();
+        // 🔴 MORE DEBUG (optional; remove later)
+        speciesGrid.innerHTML += `
+          <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
+            Species objects created: ${species.length}<br>
+            First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
+          </div>
+        `;
+
+        renderSpecies();
+        renderAlphabet();
+        updateProgress();
       })
       .catch(err => {
         speciesGrid.innerHTML = `
@@ -153,28 +119,20 @@ renderAlphabet();
       });
   }
 
-  // =========================
-  // renderSpecies (CHANGED surgically)
-  // =========================
   function renderSpecies() {
+    // Clear grid (this will remove the debug boxes once it renders cards)
     speciesGrid.innerHTML = '';
     for (const k of Object.keys(letterRefs)) delete letterRefs[k];
 
     const query = (searchInput.value || '').trim().toLowerCase();
-    const filter = filterSelect.value;
+    const filter = filterSelect.value; // "All Species" or GBR/GSR/etc
 
     const filtered = species
       .filter(f => {
-  if (MODE === 'catalogue') return true;
-
-  // Discovery: hide undrawn fish
-  if (!isIllustrated(f)) return false;
-
-  const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
-  if (filter === 'All Species') return true;
-  return loc === filter;
-})
-
+        const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
+        if (filter === 'All Species') return true;
+        return loc === filter;
+      })
       .filter(f => {
         const name = pick(f, ['name', 'common_name', 'title'], '').toLowerCase();
         const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
@@ -191,38 +149,33 @@ renderAlphabet();
       const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '');
       const desc = pick(f, ['description', 'desc', 'blurb'], '');
 
+      // image filename (not URL)
       const rawFilename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
+
       const filename = rawFilename
         .normalize('NFKD')
         .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
         .replace(/\s+/g, '')
         .trim();
 
-      const illustrated = isIllustrated(f);
-
       const card = document.createElement('div');
-      card.className = 'species-card';
-card.classList.remove('locked', 'unlocked');
-
-
-      // ADDED: lock/unlock logic
-      if (MODE === 'catalogue') {
-        card.classList.add(illustrated ? 'unlocked' : 'locked');
-      } else {
-        if (!illustrated) card.classList.add('locked');
-        else card.classList.add(discovered ? 'unlocked' : 'locked');
-      }
+      card.className = 'species-card unlocked';
 
       const img = document.createElement('img');
 
       if (filename) {
         img.src = `/reefspotter3/images/${filename}`;
       } else {
+        // If no filename, just don't break the layout
         img.removeAttribute('src');
       }
 
       img.alt = name || 'Species image';
-      img.onerror = () => (img.style.display = 'none');
+
+      // If image fails, hide it (no placeholder file needed)
+      img.onerror = () => {
+        img.style.display = 'none';
+      };
 
       const text = document.createElement('div');
       text.className = 'card-text';
@@ -240,59 +193,22 @@ card.classList.remove('locked', 'unlocked');
 
       text.append(nameEl, sciEl, descEl);
       card.append(img, text);
-    speciesGrid.appendChild(card);
+      speciesGrid.appendChild(card);
 
-// CLICK-TO-DISCOVER (TOGGLE, LIVE STATE)
-card.addEventListener('click', () => {
-  if (MODE !== 'discovery') return;
-  if (!illustrated) return;
+      const firstLetter = (name[0] || '').toUpperCase();
+      if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
+    });
 
-  if (discoveredSet.has(name)) {
-    discoveredSet.delete(name);
-  } else {
-    discoveredSet.add(name);
+    updateProgress(filtered.length);
   }
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify([...discoveredSet])
-  );
-
-  renderSpecies();
-});
-
-const firstLetter = (name[0] || '').toUpperCase();
-if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
-});
-
-updateProgress();
-}
-
-
-  // =========================
-  // updateProgress (CHANGED)
-  // =========================
-  function updateProgress() {
-    const total = species.length;
-    const illustrated = species.filter(isIllustrated);
-    const discoveredIllustrated = illustrated.filter(f =>
-      discoveredSet.has(pick(f, ['name'], ''))
-    );
-
-    const pct =
-      MODE === 'catalogue'
-        ? total ? (illustrated.length / total) * 100 : 0
-        : illustrated.length
-        ? (discoveredIllustrated.length / illustrated.length) * 100
-        : 0;
-
+  function updateProgress(visibleCount = species.length) {
+    const total = species.length || 0;
+    const pct = total ? Math.round((visibleCount / total) * 100) : 0;
     progressBar.style.width = `${pct}%`;
-    progressText.textContent = `${Math.round(pct)}%`;
+    progressText.textContent = `${pct}%`;
   }
 
-  // =========================
-  // renderAlphabet (UNCHANGED)
-  // =========================
   function renderAlphabet() {
     alphabetContainer.innerHTML = '';
     alphabet.forEach(letter => {
@@ -307,16 +223,8 @@ updateProgress();
     });
   }
 
-  // =========================
-  // Listeners (UNCHANGED)
-  // =========================
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
-document.getElementById('mode-toggle')
-  .addEventListener('click', () => {
-    setMode(MODE === 'discovery' ? 'catalogue' : 'discovery');
-  });
-
 
   loadCSV();
 });
