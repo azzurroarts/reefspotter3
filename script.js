@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+  localStorage.removeItem('reefspotter3_discovered');
+
   const speciesGrid = document.getElementById('species-grid');
   const searchInput = document.getElementById('search');
   const filterSelect = document.getElementById('filter');
