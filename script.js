@@ -175,20 +175,33 @@ const filename = rawFilename
       const card = document.createElement('div');
       card.className = 'species-card unlocked';
 
-      const img = document.createElement('img');
+    const img = document.createElement('img');
 
-      if (filename) {
-      img.src = `/reefspotter/images/${filename}`;
-      } else {
-        // If missing, point to placeholder so the card still shows
-        img.src = '/reefspotter/images/placeholder.png';
-      }
+if (filename) {
+  img.src = `/reefspotter/images/${filename}`;
+} else {
+  img.src = '/reefspotter/images/placeholder.png';
+}
 
-      img.alt = name || 'Species image';
-      img.onerror = () => {
-        img.src = '/reefspotter/images/placeholder.png';
-        img.alt = `${name || 'Species'} (image missing)`;
-      };
+img.alt = name || 'Species image';
+
+img.onerror = () => {
+  const debug = document.createElement('div');
+  debug.style.fontSize = '11px';
+  debug.style.color = 'red';
+  debug.style.padding = '6px';
+  debug.style.wordBreak = 'break-all';
+  debug.innerHTML = `
+    <strong>IMAGE FAIL</strong><br>
+    name: ${name}<br>
+    raw: "${rawFilename}"<br>
+    cleaned: "${filename}"<br>
+    url: /reefspotter/images/${filename}<br>
+    raw char codes: ${[...rawFilename].map(c => c.charCodeAt(0)).join(', ')}
+  `;
+  img.replaceWith(debug);
+};
+
 
       const text = document.createElement('div');
       text.className = 'card-text';
