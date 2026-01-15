@@ -199,15 +199,26 @@ document.addEventListener('DOMContentLoaded', () => {
       if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
     });
 
-    updateProgress(filtered.length);
+    updateProgress();
   }
 
-  function updateProgress(visibleCount = species.length) {
-    const total = species.length || 0;
-    const pct = total ? Math.round((visibleCount / total) * 100) : 0;
-    progressBar.style.width = `${pct}%`;
-    progressText.textContent = `${pct}%`;
-  }
+  function updateProgress() {
+  const total = species.length || 0;
+
+  const illustratedCount = species.filter(f => {
+    const raw = pick(f, ['image_url', 'image', 'img', 'filename'], '');
+    const v = raw.toLowerCase();
+    return raw && v !== 'undefined' && v !== 'null';
+  }).length;
+
+  const pct = total
+    ? Math.round((illustratedCount / total) * 100)
+    : 0;
+
+  progressBar.style.width = `${pct}%`;
+  progressText.textContent = `${pct}% illustrated`;
+}
+
 
   function renderAlphabet() {
     alphabetContainer.innerHTML = '';
