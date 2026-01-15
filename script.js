@@ -7,206 +7,114 @@ document.addEventListener('DOMContentLoaded', () => {
   const alphabetContainer = document.getElementById('alphabet');
 
   let species = [];
+  let unlocked = [];
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const letterRefs = {};
 
-  // Robust CSV parser: quoted fields, commas in quotes, escaped quotes ("")
-  function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let field = '';
-    let inQuotes = false;
+  // Load CSV
+  fetch('fish.csv')
+    .then(res => res.text())
+    .then(data => {
+      const [headerLine, ...lines] = data.split('\n').filter(l => l.trim() !== '');
+      const headers = headerLine.split(',').map(h => h.trim());
 
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      const next = text[i + 1];
-
-      if (c === '"') {
-        if (inQuotes && next === '"') {
-          field += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-        continue;
-      }
-
-      if (c === ',' && !inQuotes) {
-        row.push(field);
-        field = '';
-        continue;
-      }
-
-      if ((c === '\n' || c === '\r') && !inQuotes) {
-        if (c === '\r' && next === '\n') i++;
-        row.push(field);
-        field = '';
-        if (row.some(cell => cell.trim() !== '')) rows.push(row);
-        row = [];
-        continue;
-      }
-
-      field += c;
-    }
-
-    if (field.length || row.length) {
-      row.push(field);
-      if (row.some(cell => cell.trim() !== '')) rows.push(row);
-    }
-
-    return rows;
-  }
-
-  // Pick the first existing key from a list of possibilities
-  function pick(obj, keys, fallback = '') {
-    for (const k of keys) {
-      if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') {
-        return String(obj[k]).trim();
-      }
-    }
-    return fallback;
-  }
-
-  function loadCSV() {
-    fetch('fish.csv')
-      .then(res => {
-        if (!res.ok) throw new Error(`fish.csv fetch failed (${res.status})`);
-        return res.text();
-      })
-      .then(text => {
-        text = text.replace(/^\uFEFF/, ''); // strip BOM
-
-        const rows = parseCSV(text);
-
-        // 🔴 DEBUG OUTPUT ON PAGE (optional; remove later)
-        speciesGrid.innerHTML = `
-          <div style="padding:1rem;border:2px solid #000;border-radius:12px;margin:1rem;">
-            <strong>DEBUG:</strong><br>
-            Rows parsed: ${rows.length}<br>
-            First row (headers): ${rows[0] ? rows[0].join(' | ') : 'NONE'}
-          </div>
-        `;
-
-        if (!rows.length) throw new Error('No rows parsed from CSV');
-
-        const headers = rows[0].map(h => h.replace(/^\uFEFF/, '').trim().toLowerCase());
-        species = rows.slice(1).map(cols => {
-          const obj = {};
-          headers.forEach((h, i) => {
-            obj[h] = (cols[i] ?? '').trim();
-          });
-          return obj;
-        });
-
-        // 🔴 MORE DEBUG (optional; remove later)
-        speciesGrid.innerHTML += `
-          <div style="padding:1rem;border:2px dashed #000;border-radius:12px;margin:1rem;">
-            Species objects created: ${species.length}<br>
-            First species keys: ${species[0] ? Object.keys(species[0]).join(', ') : 'NONE'}
-          </div>
-        `;
-
-        renderSpecies();
-        renderAlphabet();
-        updateProgress();
-      })
-      .catch(err => {
-        speciesGrid.innerHTML = `
-          <div style="padding:1rem;border:2px solid red;border-radius:12px;margin:1rem;">
-            CSV ERROR: ${err.message}
-          </div>
-        `;
-      });
-  }
-
-  function renderSpecies() {
-    // Clear grid (this will remove the debug boxes once it renders cards)
-    speciesGrid.innerHTML = '';
-    for (const k of Object.keys(letterRefs)) delete letterRefs[k];
-
-    const query = (searchInput.value || '').trim().toLowerCase();
-    const filter = filterSelect.value; // "All Species" or GBR/GSR/etc
-
-    const filtered = species
-      .filter(f => {
-        const loc = pick(f, ['location', 'category', 'region', 'tag'], '');
-        if (filter === 'All Species') return true;
-        return loc === filter;
-      })
-      .filter(f => {
-        const name = pick(f, ['name', 'common_name', 'title'], '').toLowerCase();
-        const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '').toLowerCase();
-        return name.includes(query) || sci.includes(query);
-      })
-      .sort((a, b) => {
-        const an = pick(a, ['name', 'common_name', 'title'], '');
-        const bn = pick(b, ['name', 'common_name', 'title'], '');
-        return an.localeCompare(bn);
+      species = lines.map(line => {
+        const values = line.split(',').map(v => v.trim());
+        const obj = {};
+        headers.forEach((header, i) => obj[header] = values[i] || '');
+        return obj;
       });
 
-    filtered.forEach(f => {
-      const name = pick(f, ['name', 'common_name', 'title'], '');
-      const sci = pick(f, ['scientific_name', 'scientific', 'latin_name'], '');
-      const desc = pick(f, ['description', 'desc', 'blurb'], '');
-
-      // image filename (not URL)
-      const rawFilename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
-
-      const filename = rawFilename
-        .normalize('NFKD')
-        .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
-        .replace(/\s+/g, '')
-        .trim();
-
-      const card = document.createElement('div');
-      card.className = 'species-card unlocked';
-
-      const img = document.createElement('img');
-
-      if (filename) {
-        img.src = `/reefspotter3/images/${filename}`;
-      } else {
-        // If no filename, just don't break the layout
-        img.removeAttribute('src');
-      }
-
-      img.alt = name || 'Species image';
-
-      // If image fails, hide it (no placeholder file needed)
-      img.onerror = () => {
-        img.style.display = 'none';
-      };
-
-      const text = document.createElement('div');
-      text.className = 'card-text';
-
-      const nameEl = document.createElement('h2');
-      nameEl.textContent = name;
-
-      const sciEl = document.createElement('p');
-      sciEl.className = 'scientific-name';
-      sciEl.textContent = sci;
-
-      const descEl = document.createElement('p');
-      descEl.className = 'description';
-      descEl.textContent = desc;
-
-      text.append(nameEl, sciEl, descEl);
-      card.append(img, text);
-      speciesGrid.appendChild(card);
-
-      const firstLetter = (name[0] || '').toUpperCase();
-      if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
+      renderSpecies();
+      renderAlphabet();
+      updateProgress();
     });
 
-    updateProgress(filtered.length);
+  function renderSpecies() {
+    const filterValue = filterSelect.value;
+    const searchTerm = searchInput.value.toLowerCase();
+
+   const filtered = species
+  .filter(f => filterValue === 'All Species' || f.location === filterValue)
+  .filter(f =>
+    (f.name && f.name.toLowerCase().includes(searchTerm)) ||
+    (f.scientific_name && f.scientific_name.toLowerCase().includes(searchTerm)) ||
+    (f.description && f.description.toLowerCase().includes(searchTerm))
+  )
+  .filter(f => f.image_url && f.image_url !== 'UNDEFINED') // <<< skips placeholders
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+    speciesGrid.innerHTML = '';
+
+    filtered.forEach((fish, idx, arr) => {
+      const firstLetter = fish.name.charAt(0).toUpperCase();
+      const prevFirstLetter = idx > 0 ? arr[idx - 1].name.charAt(0).toUpperCase() : null;
+
+      const cardWrapper = document.createElement('div');
+      if (firstLetter !== prevFirstLetter) letterRefs[firstLetter] = cardWrapper;
+
+      const card = document.createElement('div');
+      card.className = unlocked.includes(fish.name) ? 'species-card unlocked' : 'species-card locked';
+
+      // Image
+      if (fish.image_url) {
+        const img = document.createElement('img');
+        img.src = fish.image_url;
+        img.alt = fish.name;
+        card.appendChild(img);
+      }
+
+      // Name
+      if (fish.name) {
+        const nameEl = document.createElement('h2');
+        nameEl.textContent = fish.name;
+        nameEl.style.textAlign = 'center';
+        nameEl.style.padding = '0.5rem';
+        card.appendChild(nameEl);
+      }
+
+      // Scientific name
+      if (fish.scientific_name) {
+        const sciEl = document.createElement('p');
+        sciEl.textContent = fish.scientific_name;
+        sciEl.className = 'italic';
+        sciEl.style.textAlign = 'center';
+        sciEl.style.padding = '0 0.5rem';
+        card.appendChild(sciEl);
+      }
+
+      // Description
+      if (fish.description) {
+        const descEl = document.createElement('p');
+        descEl.textContent = fish.description;
+        descEl.style.textAlign = 'justify';
+        descEl.style.padding = '0 0.5rem 0.5rem 0.5rem';
+        card.appendChild(descEl);
+      }
+
+      card.addEventListener('click', () => {
+        card.classList.toggle('locked');
+        card.classList.toggle('unlocked');
+
+        if (unlocked.includes(fish.name)) {
+          unlocked = unlocked.filter(n => n !== fish.name);
+        } else {
+          unlocked.push(fish.name);
+        }
+        updateProgress();
+      });
+
+      cardWrapper.appendChild(card);
+      speciesGrid.appendChild(cardWrapper);
+    });
   }
 
-  function updateProgress(visibleCount = species.length) {
-    const total = species.length || 0;
-    const pct = total ? Math.round((visibleCount / total) * 100) : 0;
-    progressBar.style.width = `${pct}%`;
-    progressText.textContent = `${pct}%`;
+  function updateProgress() {
+    const total = speciesGrid.children.length;
+    const unlockedCount = unlocked.length;
+    const percent = total ? Math.round((unlockedCount / total) * 100) : 0;
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
   }
 
   function renderAlphabet() {
@@ -225,6 +133,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
-
-  loadCSV();
 });
