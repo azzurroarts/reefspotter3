@@ -16,13 +16,13 @@ header {
 
 h1 {
   font-size: 2rem;
-  color: black;
+  color: white;
   margin: 0 0 0.5rem 0;
   text-transform: lowercase;
 }
 h2 {
   font-size: 1rem;
-  color: white;
+  color: black;
   margin: 0 0 0.5rem 0;
   text-transform: lowercase;
 }
