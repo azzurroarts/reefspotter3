@@ -175,6 +175,6 @@ select, input {
 mark {
   background-color: #fde047;
   color: black;
-  border-radius: 0.2rem;
+  border-radius: 0.2rem; 
   padding: 0 0.1rem;
 }
