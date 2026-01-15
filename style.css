@@ -168,33 +168,37 @@ select, input {
   }
 }
 
+/* Base state */
 .alphabet-letter {
+  color: #ffffff;                 /* 👈 white letters */
+  font-weight: 600;
+  transform: scale(1);          /* 👈 start smaller */
+  opacity: 0.4;
   transition:
-    transform 0.18s ease,
-    opacity 0.18s ease,
-    color 0.18s ease;
-  transform: scale(0.9);
-  opacity: 0.5;
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.25s ease,
+    color 0.25s ease;
 }
 
-/* hovered letter */
+/* Hovered letter (big pop) */
 .alphabet-letter:hover {
-  transform: scale(1.4);
+  transform: scale(3);          /* 👈 WAY more dramatic */
   opacity: 1;
-  color: #000;
+  color: #ffffff;
 }
 
-/* immediate neighbours = wave */
+/* Neighbour wave */
 .alphabet-letter:hover + .alphabet-letter,
 .alphabet-letter:has(+ .alphabet-letter:hover) {
-  transform: scale(1.15);
+  transform: scale(1.4);          /* 👈 strong wave */
   opacity: 0.8;
 }
 
+/* Active (current scroll position) */
 .alphabet-letter.active {
-  transform: scale(1.3);
+  transform: scale(2.4);          /* 👈 biggest */
   opacity: 1;
-  color: #000;
+  color: #ff2f92;                  /* 👈 HOT PINK */
 }
 
 
