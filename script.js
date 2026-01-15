@@ -234,6 +234,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function updateActiveLetter() {
+  const cards = document.querySelectorAll('.species-card');
+  let currentLetter = null;
+
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    if (rect.top >= 0 && rect.top < window.innerHeight * 0.3) {
+      const title = card.querySelector('h2');
+      if (title) {
+        currentLetter = title.textContent[0]?.toUpperCase();
+      }
+      break;
+    }
+  }
+
+  document.querySelectorAll('.alphabet-letter').forEach(el => {
+    el.classList.toggle('active', el.textContent === currentLetter);
+  });
+}
+
+window.addEventListener('scroll', updateActiveLetter, { passive: true });
+
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
 
