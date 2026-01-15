@@ -26,6 +26,12 @@ h2 {
   margin: 0 0 0.5rem 0;
   text-transform: lowercase;
 }
+h3 {
+  font-size: 1rem;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  text-transform: lowercase;
+}
 
 .controls {
   display: flex;
