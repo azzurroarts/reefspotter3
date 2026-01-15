@@ -162,7 +162,11 @@ select, input {
   z-index: 1000;             /* above everything */
 }
 
-
+@media (max-width: 640px) {
+  .vertical-alphabet {
+    top: 140px;   /* below black header on mobile */
+  }
+}
 
 .alphabet-letter {
   cursor: pointer;
