@@ -164,7 +164,9 @@ select, input {
 
 @media (max-width: 640px) {
   .vertical-alphabet {
-    top: 300px;   /* below black header on mobile */
+  top: 160px;          /* start just below header */
+    bottom: 80px;       /* keep it off the bottom UI */
+    justify-content: center;
   }
 }
 
