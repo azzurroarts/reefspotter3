@@ -65,7 +65,7 @@ select, input {
 
 #progress-text {
   position: absolute;
-  right: 0.5rem;
+  left: 0.75rem;
   top: 50%; /* vertically center */
   transform: translateY(-50%);
   font-weight: bold;
