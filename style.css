@@ -164,25 +164,31 @@ select, input {
 
 @media (max-width: 640px) {
   .vertical-alphabet {
-    top: 140px;   /* below black header on mobile */
+    top: 300px;   /* below black header on mobile */
   }
 }
 
 .alphabet-letter {
-  cursor: pointer;
-  font-weight: bold;
-  color: #9ca3af;
-  user-select: none;
-  transition: transform 0.2s;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    color 0.18s ease;
+  transform: scale(0.9);
+  opacity: 0.5;
 }
 
-.alphabet-letter.active {
-  color: pink;
-  text-shadow: 0 0 8px rgba(255,255,255,0.9);
-}
-
+/* hovered letter */
 .alphabet-letter:hover {
-  transform: scale(2);
+  transform: scale(1.4);
+  opacity: 1;
+  color: #000;
+}
+
+/* immediate neighbours = wave */
+.alphabet-letter:hover + .alphabet-letter,
+.alphabet-letter:has(+ .alphabet-letter:hover) {
+  transform: scale(1.15);
+  opacity: 0.8;
 }
 
 mark {
