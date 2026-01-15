@@ -164,9 +164,10 @@ select, input {
 
 @media (max-width: 640px) {
   .vertical-alphabet {
-  top: 160px;          /* start just below header */
-    bottom: 80px;       /* keep it off the bottom UI */
-    justify-content: center;
+ top: 200px;              /* safely below header */
+    bottom: auto;            /* stop stretching */
+    height: 60vh;            /* 👈 constrain height */
+    justify-content: center; /* keep letters centred */
   }
 }
 
