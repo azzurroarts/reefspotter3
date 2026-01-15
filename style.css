@@ -99,6 +99,8 @@ select, input {
   display: flex;
   flex-direction: column;
   background: white;
+  padding: 6px;          /* 👈 small, clean padding */
+  box-sizing: border-box;
 }
 
 /* Fish Image */
@@ -106,8 +108,7 @@ select, input {
   width: 100%;
   aspect-ratio: 1 / 1; /* square images, large */
   object-fit: cover;
-  padding: 6px;          /* 👈 small, clean padding */
-  box-sizing: border-box;
+  
 }
 
 /* Text container inside card */
