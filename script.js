@@ -175,20 +175,22 @@ function getRandomPlaceholder() {
 
   
 
-      const img = document.createElement('img');
+          const img = document.createElement('img');
 
-const isIllustrated =
-  filename &&
-  filename.toLowerCase() !== 'undefined' &&
-  filename.toLowerCase() !== 'null';
+      const isIllustrated =
+        typeof filename === 'string' &&
+        filename.length > 0 &&
+        filename.toLowerCase() !== 'undefined' &&
+        filename.toLowerCase() !== 'null';
 
-if (isIllustrated) {
-  img.src = `/reefspotter3/images/${filename}`;
-  card.classList.add('unlocked');
-} else {
-  img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
-  card.classList.add('locked');
-}
+      if (isIllustrated) {
+        img.src = `/reefspotter3/images/${filename}`;
+        card.classList.add('unlocked');
+      } else {
+        img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
+        card.classList.add('locked');
+      }
+
 
 
       img.alt = name || 'Species image';
