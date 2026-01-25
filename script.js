@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const PLACEHOLDERS = [
+  'placeholder1.png',
+  'placeholder2.png',
+  'placeholder3.png',
+  'placeholder4.png',
+  'placeholder5.png'
+];
+
+function getRandomPlaceholder() {
+  return PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
+}
+
   const speciesGrid = document.getElementById('species-grid');
   const searchInput = document.getElementById('search');
   const filterSelect = document.getElementById('filter');
@@ -163,12 +175,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const img = document.createElement('img');
 
-      if (filename) {
-        img.src = `/reefspotter3/images/${filename}`;
-      } else {
-        // If no filename, just don't break the layout
-        img.removeAttribute('src');
-      }
+      const img = document.createElement('img');
+
+const isIllustrated =
+  filename &&
+  filename.toLowerCase() !== 'undefined' &&
+  filename.toLowerCase() !== 'null';
+
+if (isIllustrated) {
+  img.src = `/reefspotter3/images/${filename}`;
+  card.classList.add('unlocked');
+} else {
+  img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
+  card.classList.add('locked');
+}
+
 
       img.alt = name || 'Species image';
 
