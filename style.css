@@ -111,6 +111,16 @@ select, input {
   
 }
 
+/* Placeholder images should be smaller + centred */
+.species-card.locked img {
+  width: 70%;
+  aspect-ratio: auto;
+  object-fit: contain;
+  margin: 1.5rem auto 0.5rem;
+  opacity: 0.85;
+}
+
+
 /* Text container inside card */
 .species-card .card-text {
   display: flex;
