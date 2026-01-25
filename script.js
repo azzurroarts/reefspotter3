@@ -224,6 +224,27 @@ if (isIllustrated) {
 
     updateProgress();
   }
+  /* placeholder animations*/
+  function setupPlaceholderAnimation() {
+    const placeholders = document.querySelectorAll('.species-card.locked img');
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('wiggle');
+          } else {
+            entry.target.classList.remove('wiggle');
+          }
+        });
+      },
+      {
+        threshold: 0.6
+      }
+    );
+
+    placeholders.forEach(img => observer.observe(img));
+  }
 
   function updateProgress() {
   const total = species.length || 0;
