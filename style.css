@@ -130,10 +130,10 @@ select, input {
   100% { transform: translateY(0) rotate(0deg); }
 }
 
-.species-card.locked img {
-  animation: wriggle 0.6s ease-in-out infinite;
-  animation-delay: 4s;
+.species-card.locked img.wiggle {
+  animation: wriggle 0.6s ease-in-out;
 }
+
 
 
 
