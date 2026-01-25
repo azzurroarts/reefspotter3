@@ -173,7 +173,7 @@ function getRandomPlaceholder() {
       const card = document.createElement('div');
       card.className = 'species-card unlocked';
 
-      const img = document.createElement('img');
+  
 
       const img = document.createElement('img');
 
