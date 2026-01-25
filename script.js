@@ -195,11 +195,7 @@ function getRandomPlaceholder() {
 
       img.alt = name || 'Species image';
 
-      // If image fails, hide it (no placeholder file needed)
-      img.onerror = () => {
-        img.style.display = 'none';
-      };
-
+      
       const text = document.createElement('div');
       text.className = 'card-text';
 
