@@ -162,34 +162,38 @@ function getRandomPlaceholder() {
       const desc = pick(f, ['description', 'desc', 'blurb'], '');
 
       // image filename (not URL)
-      const rawFilename = pick(f, ['image_url', 'image', 'img', 'filename', 'file'], '');
+      const rawFilename = pick(f, ['image_url'], '');
 
-      const filename = rawFilename
-        .normalize('NFKD')
-        .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
-        .replace(/\s+/g, '')
-        .trim();
+const isIllustrated =
+  typeof rawFilename === 'string' &&
+  rawFilename.length > 0 &&
+  rawFilename.toLowerCase() !== 'undefined' &&
+  rawFilename.toLowerCase() !== 'null';
+
+const filename = isIllustrated
+  ? rawFilename
+      .normalize('NFKD')
+      .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
+      .replace(/\s+/g, '')
+      .trim()
+  : '';
+
 
       const card = document.createElement('div');
-      card.className = 'species-card unlocked';
+      card.className = 'species-card';
+
 
   
 
           const img = document.createElement('img');
 
-      const isIllustrated =
-        typeof filename === 'string' &&
-        filename.length > 0 &&
-        filename.toLowerCase() !== 'undefined' &&
-        filename.toLowerCase() !== 'null';
-
-      if (isIllustrated) {
-        img.src = `/reefspotter3/images/${filename}`;
-        card.classList.add('unlocked');
-      } else {
-        img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
-        card.classList.add('locked');
-      }
+if (isIllustrated) {
+  img.src = `/reefspotter3/images/${filename}`;
+  card.classList.add('unlocked');
+} else {
+  img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
+  card.classList.add('locked');
+}
 
 
 
