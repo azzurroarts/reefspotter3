@@ -227,25 +227,42 @@ if (isIllustrated) {
   }
   /* placeholder animations*/
   function setupPlaceholderAnimation() {
-    const placeholders = document.querySelectorAll('.species-card.locked img');
+  const placeholders = document.querySelectorAll('.species-card.locked img');
 
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('wiggle');
-          } else {
-            entry.target.classList.remove('wiggle');
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        const img = entry.target;
+
+        if (entry.isIntersecting) {
+          // Start gentle periodic wiggle
+          if (!img._wiggleInterval) {
+            img.classList.add('wiggle');
+
+            img._wiggleInterval = setInterval(() => {
+              img.classList.remove('wiggle');
+              void img.offsetWidth; // force reflow
+              img.classList.add('wiggle');
+            }, 4500); // every ~4.5s
           }
-        });
-      },
-      {
-        threshold: 0.6
-      }
-    );
+        } else {
+          // Stop wiggle when offscreen
+          if (img._wiggleInterval) {
+            clearInterval(img._wiggleInterval);
+            img._wiggleInterval = null;
+          }
+          img.classList.remove('wiggle');
+        }
+      });
+    },
+    {
+      threshold: 0.6
+    }
+  );
 
-    placeholders.forEach(img => observer.observe(img));
-  }
+  placeholders.forEach(img => observer.observe(img));
+}
+
 
   function updateProgress() {
   const total = species.length || 0;
