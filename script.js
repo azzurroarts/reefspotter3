@@ -223,6 +223,7 @@ if (isIllustrated) {
     });
 
     updateProgress();
+        setupPlaceholderAnimation();
   }
   /* placeholder animations*/
   function setupPlaceholderAnimation() {
