@@ -503,6 +503,15 @@ glitterLayer.innerHTML = '';
   // extract dominant species colour for glitter
 const dominantColour = extractDominantColour(img);
 glitterLayer.style.setProperty('--sparkle-colour', dominantColour);
+  // apply dominant colour to background atmosphere
+const bg = magnifyOverlay.querySelector('.magnify-bg');
+
+// soften + add alpha so it never overwhelms
+bg.style.setProperty(
+  '--bg-colour',
+  dominantColour.replace('rgb', 'rgba').replace(')', ', 0.35)')
+);
+
 
 const sparkleColour =
   magnifyOverlay.querySelector('.magnify-bg')?.style.backgroundColor ||
@@ -583,7 +592,9 @@ magnifyOverlay.addEventListener("click", () => {
 
   magnifyOverlay._glitterActive = false;
 clearInterval(magnifyOverlay._glitterInterval);
+bg.style.removeProperty('--bg-colour');
 
+  
   // reset visuals to prevent leftovers on fast reopen
   magnifyImage.style.opacity = '0';
   magnifyOverlay.querySelector('.magnify-bg').style.opacity = '0';
