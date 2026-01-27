@@ -444,7 +444,7 @@ document.addEventListener("click", (e) => {
   });
 
   // --- END ZOOM ---
-
+});
 
 // Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
