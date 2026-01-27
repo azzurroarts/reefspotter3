@@ -374,47 +374,73 @@ window.addEventListener('scroll', updateActiveLetter, { passive: true });
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
 
-/* =========================
-   MAGNIFY MODE — STEP 2
-   Event delegation (correct)
-   ========================= */
+  /* =========================
+     MAGNIFY MODE — STEP 2
+     Event delegation
+     ========================= */
 
-const magnifyOverlay = document.getElementById("magnify-overlay");
-const magnifyImage = magnifyOverlay.querySelector(".magnify-image");
-const magnifyCommon = magnifyOverlay.querySelector(".magnify-common");
-const magnifyScientific = magnifyOverlay.querySelector(".magnify-scientific");
-const magnifyDescription = magnifyOverlay.querySelector(".magnify-description");
-const magnifyLore = magnifyOverlay.querySelector(".magnify-lore");
+  const magnifyOverlay = document.getElementById("magnify-overlay");
+  const magnifyImage = magnifyOverlay.querySelector(".magnify-image");
+  const magnifyCommon = magnifyOverlay.querySelector(".magnify-common");
+  const magnifyScientific = magnifyOverlay.querySelector(".magnify-scientific");
+  const magnifyDescription = magnifyOverlay.querySelector(".magnify-description");
+  const magnifyLore = magnifyOverlay.querySelector(".magnify-lore");
 
-// Handle clicks on unlocked cards (even if created later)
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".species-card.unlocked");
-  if (!card) return;
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest(".species-card.unlocked");
+    if (!card) return;
 
-  const img = card.querySelector("img");
-  const common = card.querySelector("h2");
-  const scientific = card.querySelector(".scientific-name");
-  const description = card.querySelector(".description");
+    const img = card.querySelector("img");
+    const common = card.querySelector("h2");
+    const scientific = card.querySelector(".scientific-name");
+    const description = card.querySelector(".description");
 
-  // Populate overlay
-  magnifyImage.src = img?.src || "";
-  magnifyImage.alt = img?.alt || "";
+    magnifyImage.src = img?.src || "";
+    magnifyImage.alt = img?.alt || "";
 
-  magnifyCommon.textContent = common?.textContent || "";
-  magnifyScientific.textContent = scientific?.textContent || "";
-  magnifyDescription.textContent = description?.textContent || "";
-  magnifyLore.textContent = ""; // later CSV column
+    // Starting position: roughly from card
+const rect = img.getBoundingClientRect();
 
-  // Show overlay instantly
-  magnifyOverlay.classList.add("is-visible");
-  magnifyOverlay.setAttribute("aria-hidden", "false");
+magnifyImage.style.top = `${rect.top}px`;
+magnifyImage.style.left = `${rect.left}px`;
+magnifyImage.style.width = `${rect.width}px`;
+magnifyImage.style.transform = 'none';
+
+// force layout so browser commits start state
+magnifyImage.getBoundingClientRect();
+
+// Animate to centre + hero size
+requestAnimationFrame(() => {
+  magnifyImage.style.top = '50%';
+  magnifyImage.style.left = '50%';
+  magnifyImage.style.width = 'min(62vw, 560px)';
+  magnifyImage.style.transform = 'translate(-50%, -50%)';
 });
 
-// Click anywhere on overlay to close
-magnifyOverlay.addEventListener("click", () => {
-  magnifyOverlay.classList.remove("is-visible");
-  magnifyOverlay.setAttribute("aria-hidden", "true");
-});
+
+    magnifyCommon.textContent = common?.textContent || "";
+    magnifyScientific.textContent = scientific?.textContent || "";
+    magnifyDescription.textContent = description?.textContent || "";
+    magnifyLore.textContent = "";
+
+    magnifyOverlay.classList.add("is-visible");
+    // Fade in background
+const bg = magnifyOverlay.querySelector('.magnify-bg');
+bg.style.opacity = '1';
+
+// Fade in text slightly later
+setTimeout(() => {
+  const text = magnifyOverlay.querySelector('.magnify-text');
+  text.style.opacity = '1';
+}, 180);
+
+    magnifyOverlay.setAttribute("aria-hidden", "false");
+  });
+
+  magnifyOverlay.addEventListener("click", () => {
+    magnifyOverlay.classList.remove("is-visible");
+    magnifyOverlay.setAttribute("aria-hidden", "true");
+  });
 
   loadCSV();
 });
