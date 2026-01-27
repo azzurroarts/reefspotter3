@@ -362,6 +362,26 @@ if (funder) {
 
       card.append(img, text);
       speciesGrid.appendChild(card);
+// 🅰️ alphabet colour echo on hover (unlocked only)
+if (isIllustrated) {
+  card.addEventListener('mouseenter', () => {
+    const letter = name[0]?.toUpperCase();
+    const alphaEl = document.querySelector(
+      `.alphabet-letter.active, .alphabet-letter:nth-child(${alphabet.indexOf(letter) + 1})`
+    );
+
+    if (alphaEl) {
+      const tint = card.style.getPropertyValue('--card-tint');
+      if (tint) {
+        document.documentElement.style.setProperty('--alpha-tint', tint);
+      }
+    }
+  });
+
+  card.addEventListener('mouseleave', () => {
+    document.documentElement.style.removeProperty('--alpha-tint');
+  });
+}
 
       const firstLetter = (name[0] || '').toUpperCase();
       if (firstLetter && !letterRefs[firstLetter]) letterRefs[firstLetter] = card;
