@@ -452,6 +452,14 @@ function spawnSparkle() {
   if (!magnifyOverlay._glitterActive) return;
 
   const s = document.createElement('span');
+  // subtle variance per sparkle
+const size = 2 + Math.random() * 3; // 2–5px
+const brightness = 0.7 + Math.random() * 0.6; // glow variance
+
+s.style.width = `${size}px`;
+s.style.height = `${size}px`;
+s.style.opacity = brightness;
+
 
   const angle = Math.random() * Math.PI * 2;
   const distance = 160 + Math.random() * 220;
