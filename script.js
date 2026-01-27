@@ -222,6 +222,17 @@ if (!isIllustrated) {
       descEl.textContent = desc;
 
       text.append(nameEl, sciEl, descEl);
+
+      /*FUNDER TEXT ON CARD*/
+      const funder = pick(f, ['funder'], '');
+
+if (funder) {
+  const funderEl = document.createElement('p');
+  funderEl.className = 'funder';
+  funderEl.textContent = funder;
+  text.appendChild(funderEl);
+}
+
       card.append(img, text);
       speciesGrid.appendChild(card);
 
