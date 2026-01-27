@@ -450,7 +450,13 @@ document.addEventListener("click", (e) => {
 magnifyOverlay.addEventListener("click", () => {
   magnifyOverlay.classList.remove("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "true");
+
+  // reset visuals to prevent leftovers on fast reopen
+  magnifyImage.style.opacity = '0';
+  magnifyOverlay.querySelector('.magnify-bg').style.opacity = '0';
+  magnifyOverlay.querySelector('.magnify-text').style.opacity = '0';
 });
+
 
   loadCSV();
 });
