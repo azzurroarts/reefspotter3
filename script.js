@@ -519,8 +519,19 @@ document.addEventListener("click", (e) => {
   const description = card.querySelector(".description");
 
   // Populate overlay
-  magnifyImage.src = img?.src || "";
-  magnifyImage.alt = img?.alt || "";
+  // --- HARD RESET IMAGE TO KILL GHOST ---
+magnifyImage.src = "";
+magnifyImage.removeAttribute("src");
+magnifyImage.style.opacity = "0";
+magnifyImage.style.transform = "none";
+
+// force browser to forget previous bitmap
+magnifyImage.getBoundingClientRect();
+
+// NOW apply new image
+magnifyImage.src = img?.src || "";
+magnifyImage.alt = img?.alt || "";
+
 
   magnifyCommon.textContent = common?.textContent || "";
   magnifyScientific.textContent = scientific?.textContent || "";
