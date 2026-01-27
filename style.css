@@ -384,3 +384,17 @@ mark {
   opacity: 1;
 }
 
+/* =========================
+   MAGNIFY MODE — ZOOM ANIMATION
+   ========================= */
+.magnify-image {
+  transition:
+    top 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+
