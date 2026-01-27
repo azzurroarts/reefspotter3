@@ -238,3 +238,11 @@ mark {
   border-radius: 0.2rem; 
   padding: 0 0.1rem;
 }
+
+.funder {
+  margin-top: auto;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-align: right;
+}
+
