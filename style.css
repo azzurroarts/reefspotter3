@@ -22,17 +22,16 @@ header {
 }
 
 .title-fish {
-  height: 2rem;          /* matches h1 visually */
+  height: 4rem;          /* 👈 about 2× size */
   width: auto;
   opacity: 0.9;
+  animation: floaty 4s ease-in-out infinite;
 }
+
 @media (max-width: 640px) {
   .title-fish {
-    height: 1.6rem;
+    height: 3rem;
   }
-}
-.title-fish {
-  animation: floaty 4s ease-in-out infinite;
 }
 
 @keyframes floaty {
