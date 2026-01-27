@@ -435,6 +435,43 @@ imageWrap.classList.remove('reset-visuals');
 
   magnifyOverlay.classList.add("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "false");
+  // ---- GLITTER EMITTER ----
+const glitterLayer = magnifyOverlay.querySelector('.magnify-glitter-layer');
+glitterLayer.innerHTML = '';
+
+const sparkleColour =
+  magnifyOverlay.querySelector('.magnify-bg')?.style.backgroundColor ||
+  'rgba(255,255,255,0.9)';
+
+glitterLayer.style.setProperty('--sparkle-colour', sparkleColour);
+
+let glitterActive = true;
+magnifyOverlay._glitterActive = true;
+
+function spawnSparkle() {
+  if (!magnifyOverlay._glitterActive) return;
+
+  const s = document.createElement('span');
+
+  const angle = Math.random() * Math.PI * 2;
+  const distance = 160 + Math.random() * 220;
+
+  const dx = Math.cos(angle) * distance;
+  const dy = Math.sin(angle) * distance;
+
+  s.style.left = '50%';
+  s.style.top = '50%';
+  s.style.setProperty('--dx', `${dx}px`);
+  s.style.setProperty('--dy', `${dy}px`);
+
+  glitterLayer.appendChild(s);
+
+  s.addEventListener('animationend', () => s.remove());
+}
+
+// steady emission rate
+magnifyOverlay._glitterInterval = setInterval(spawnSparkle, 140);
+
   // Explicitly reset bg + text every time (inline styles override CSS)
 const bg = magnifyOverlay.querySelector('.magnify-bg');
 const text = magnifyOverlay.querySelector('.magnify-text');
@@ -469,10 +506,14 @@ magnifyOverlay.addEventListener("click", () => {
   magnifyOverlay.classList.remove("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "true");
 
+  magnifyOverlay._glitterActive = false;
+clearInterval(magnifyOverlay._glitterInterval);
+
   // reset visuals to prevent leftovers on fast reopen
   magnifyImage.style.opacity = '0';
   magnifyOverlay.querySelector('.magnify-bg').style.opacity = '0';
   magnifyOverlay.querySelector('.magnify-text').style.opacity = '0';
+  
 });
 
 
