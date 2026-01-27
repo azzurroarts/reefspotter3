@@ -406,9 +406,45 @@ document.addEventListener("click", (e) => {
   magnifyLore.textContent = ""; // later CSV column
 
   // Show overlay instantly
+    // --- ZOOM FROM CARD → CENTRE (no Step 3 precision needed) ---
+
+  // Reset any old state so you don't see the previous fish flash
+  magnifyImage.style.transition = 'none';
+  magnifyImage.style.opacity = '0';
+
+  // Start position = the clicked card image
+  const rect = img.getBoundingClientRect();
+
+  magnifyImage.style.top = `${rect.top}px`;
+  magnifyImage.style.left = `${rect.left}px`;
+  magnifyImage.style.width = `${rect.width}px`;
+  magnifyImage.style.height = `${rect.height}px`;
+  magnifyImage.style.transform = 'none';
+
+  // Show overlay AFTER positioning
   magnifyOverlay.classList.add("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "false");
-});
+
+  // Force browser to commit the start state
+  magnifyImage.getBoundingClientRect();
+
+  // Re-enable transitions so it can animate
+  magnifyImage.style.transition = '';
+
+  // Animate to centre with numeric target (no 'min()' CSS — browsers won't animate that)
+  requestAnimationFrame(() => {
+    const size = Math.min(window.innerWidth * 0.62, 560);
+
+    magnifyImage.style.opacity = '1';
+    magnifyImage.style.top = `${window.innerHeight / 2}px`;
+    magnifyImage.style.left = `${window.innerWidth / 2}px`;
+    magnifyImage.style.width = `${size}px`;
+    magnifyImage.style.height = `${size}px`;
+    magnifyImage.style.transform = 'translate(-50%, -50%)';
+  });
+
+  // --- END ZOOM ---
+
 
 // Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
