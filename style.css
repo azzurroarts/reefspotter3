@@ -396,59 +396,44 @@ mark {
     transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 200ms ease;
 }
-
 /* =========================
-   MAGNIFY MODE — SHIMMER AURA
+   MAGNIFY MODE — SHIMMER AURA (FIXED)
    ========================= */
 
 .magnify-image-wrap {
   pointer-events: none;
 }
 
-.magnify-image::before,
-.magnify-image::after {
+.magnify-image-wrap::before,
+.magnify-image-wrap::after {
   content: "";
   position: absolute;
-  inset: -14%;
+  inset: -18%;
   border-radius: 50%;
   background:
-    radial-gradient(
-      circle at 20% 30%,
-      rgba(255,255,255,0.35),
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 70% 60%,
-      rgba(255,255,255,0.25),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 40% 80%,
-      rgba(255,255,255,0.18),
-      transparent 45%
-    );
+    radial-gradient(circle at 25% 30%, rgba(255,255,255,0.35), transparent 40%),
+    radial-gradient(circle at 70% 65%, rgba(255,255,255,0.25), transparent 45%),
+    radial-gradient(circle at 45% 80%, rgba(255,255,255,0.18), transparent 50%);
   opacity: 0;
-  filter: blur(14px);
+  filter: blur(18px);
   mix-blend-mode: screen;
-  transform: scale(0.96) rotate(0deg);
+  transform: scale(0.95) rotate(0deg);
   transition: opacity 400ms ease;
-  animation: shimmer-drift 6s linear infinite;
+  animation: shimmer-drift 7s linear infinite;
 }
 
-.magnify-image::after {
-  animation-duration: 9s;
-  filter: blur(22px);
-  opacity: 0.6;
+.magnify-image-wrap::after {
+  animation-duration: 11s;
+  filter: blur(26px);
 }
 
-.magnify-overlay.is-visible .magnify-image::before,
-.magnify-overlay.is-visible .magnify-image::after {
+.magnify-overlay.is-visible .magnify-image-wrap::before,
+.magnify-overlay.is-visible .magnify-image-wrap::after {
   opacity: 0.9;
 }
 
 @keyframes shimmer-drift {
-  0%   { transform: scale(0.96) rotate(0deg); }
-  50%  { transform: scale(1.03) rotate(180deg); }
-  100% { transform: scale(0.96) rotate(360deg); }
+  0%   { transform: scale(0.95) rotate(0deg); }
+  50%  { transform: scale(1.04) rotate(180deg); }
+  100% { transform: scale(0.95) rotate(360deg); }
 }
-
