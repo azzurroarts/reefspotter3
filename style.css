@@ -246,3 +246,10 @@ mark {
   text-align: right;
 }
 
+/* Coming soon (funded but not illustrated) */
+.species-card.funded img {
+  object-fit: contain;
+  padding: 1.5rem;
+  opacity: 0.75;
+}
+
