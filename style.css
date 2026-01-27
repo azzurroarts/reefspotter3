@@ -254,7 +254,7 @@ select, input {
 .alphabet-letter.active {
   transform: scale(2.4);          /* 👈 biggest */
   opacity: 1;
-  color: #ff2f92;                  /* 👈 HOT PINK */
+    color: var(--alpha-tint, #ffffff);              /* 👈 TINT WHITE with ACTIVE COLOUR*/
 }
 
 
