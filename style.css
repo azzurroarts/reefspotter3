@@ -24,6 +24,11 @@ header {
   width: auto;
   opacity: 0.9;
 }
+@media (max-width: 640px) {
+  .title-fish {
+    height: 1.6rem;
+  }
+}
 
 h1 {
   font-size: 2rem;
