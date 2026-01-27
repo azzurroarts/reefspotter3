@@ -299,14 +299,17 @@ const filename = isIllustrated
       if (isIllustrated) {
   img.src = `/reefspotter3/images/${filename}`;
   card.classList.add('unlocked');
-        img.addEventListener('load', () => {
+   
+        // 🎨 dominant colour → boosted → card hover tint
+img.addEventListener('load', () => {
   try {
-    const tint = extractDominantColour(img);
-    const rgba = tint.replace('rgb(', 'rgba(').replace(')', ', 0.35)');
-    card.style.setProperty('--card-tint', rgba);
+    const base = extractDominantColour(img);
+    const boosted = boostColour(base);
+    card.style.setProperty('--card-tint', boosted);
   } catch (e) {
-    // fail silently — never break rendering
+    // do nothing if colour extraction fails
   }
+  });
 });
 
 
