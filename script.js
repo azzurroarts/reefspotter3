@@ -470,7 +470,7 @@ function spawnSparkle() {
 }
 
 // steady emission rate
-magnifyOverlay._glitterInterval = setInterval(spawnSparkle, 140);
+magnifyOverlay._glitterInterval = setInterval(spawnSparkle, 20);
 
   // Explicitly reset bg + text every time (inline styles override CSS)
 const bg = magnifyOverlay.querySelector('.magnify-bg');
