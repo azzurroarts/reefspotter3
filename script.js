@@ -310,7 +310,6 @@ img.addEventListener('load', () => {
     // do nothing if colour extraction fails
   }
   });
-});
 
 
 } else if (isFunded) {
