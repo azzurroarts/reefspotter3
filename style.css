@@ -397,4 +397,58 @@ mark {
     opacity 200ms ease;
 }
 
+/* =========================
+   MAGNIFY MODE — SHIMMER AURA
+   ========================= */
+
+.magnify-image-wrap {
+  pointer-events: none;
+}
+
+.magnify-image::before,
+.magnify-image::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(255,255,255,0.35),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 70% 60%,
+      rgba(255,255,255,0.25),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 40% 80%,
+      rgba(255,255,255,0.18),
+      transparent 45%
+    );
+  opacity: 0;
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  transform: scale(0.96) rotate(0deg);
+  transition: opacity 400ms ease;
+  animation: shimmer-drift 6s linear infinite;
+}
+
+.magnify-image::after {
+  animation-duration: 9s;
+  filter: blur(22px);
+  opacity: 0.6;
+}
+
+.magnify-overlay.is-visible .magnify-image::before,
+.magnify-overlay.is-visible .magnify-image::after {
+  opacity: 0.9;
+}
+
+@keyframes shimmer-drift {
+  0%   { transform: scale(0.96) rotate(0deg); }
+  50%  { transform: scale(1.03) rotate(180deg); }
+  100% { transform: scale(0.96) rotate(360deg); }
+}
 
