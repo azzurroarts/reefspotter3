@@ -422,6 +422,17 @@ document.addEventListener("click", (e) => {
   magnifyImage.style.transform = 'none';
 
   // Show overlay AFTER positioning
+  const imageWrap = magnifyOverlay.querySelector('.magnify-image-wrap');
+
+// hard reset shimmer + glitter so no previous state leaks
+imageWrap.classList.add('reset-visuals');
+
+// force browser to acknowledge reset
+imageWrap.getBoundingClientRect();
+
+// remove reset so animations restart clean
+imageWrap.classList.remove('reset-visuals');
+
   magnifyOverlay.classList.add("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "false");
   // Explicitly reset bg + text every time (inline styles override CSS)
