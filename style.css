@@ -362,3 +362,25 @@ mark {
 .magnify-lore {
   opacity: 0.78;
 }
+
+/* =========================
+   MAGNIFY MODE — STEP 2
+   Make content visible
+   ========================= */
+
+.magnify-overlay.is-visible {
+  pointer-events: auto;
+}
+
+.magnify-overlay.is-visible .magnify-bg {
+  opacity: 1;
+}
+
+.magnify-overlay.is-visible .magnify-image {
+  opacity: 1;
+}
+
+.magnify-overlay.is-visible .magnify-text {
+  opacity: 1;
+}
+
