@@ -549,6 +549,9 @@ magnifyImage.alt = img?.alt || "";
   // Start position = the clicked card image
   magnifyImage.onload = () => {
   const rect = img.getBoundingClientRect();
+    // store origin for close animation
+magnifyOverlay._originRect = rect;
+
 
   magnifyImage.style.top = `${rect.top}px`;
   magnifyImage.style.left = `${rect.left}px`;
@@ -668,32 +671,44 @@ text.style.opacity = '1';
 
 // Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
-  // stop glitter emitter immediately
+  // stop glitter
   magnifyOverlay._glitterActive = false;
   clearInterval(magnifyOverlay._glitterInterval);
 
   const bg = magnifyOverlay.querySelector('.magnify-bg');
   const text = magnifyOverlay.querySelector('.magnify-text');
+  const rect = magnifyOverlay._originRect;
 
-  // animate OUT first (do NOT hide yet)
-  magnifyImage.style.opacity = '0';
-  magnifyImage.style.transform = 'translate(-50%, -50%) scale(0.88)';
-
-  bg.style.opacity = '0';
+  // fade text + background first
   text.style.opacity = '0';
+  bg.style.opacity = '0';
 
-  // AFTER animation completes, fully hide + hard reset
+  // animate image BACK to card
+  if (rect) {
+    magnifyImage.style.opacity = '1';
+    magnifyImage.style.transform = 'none';
+    magnifyImage.style.top = `${rect.top}px`;
+    magnifyImage.style.left = `${rect.left}px`;
+    magnifyImage.style.width = `${rect.width}px`;
+    magnifyImage.style.height = `${rect.height}px`;
+  } else {
+    // fallback: gentle fade
+    magnifyImage.style.opacity = '0';
+  }
+
+  // after animation completes, fully hide + hard reset
   setTimeout(() => {
     magnifyOverlay.classList.remove("is-visible");
     magnifyOverlay.setAttribute("aria-hidden", "true");
 
-    // CRITICAL: clear image src so it can never flash
+    // HARD reset to prevent ghosting
     magnifyImage.src = "";
-
-    // clean background colour for next open
+    magnifyImage.style.opacity = '0';
+    magnifyOverlay._originRect = null;
     bg.style.removeProperty('--bg-colour');
-  }, 260); // must match / slightly exceed your CSS fade timing
+  }, 620); // must match image transition duration
 });
+
 
 
 
