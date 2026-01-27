@@ -424,6 +424,13 @@ document.addEventListener("click", (e) => {
   // Show overlay AFTER positioning
   magnifyOverlay.classList.add("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "false");
+  // Explicitly reset bg + text every time (inline styles override CSS)
+const bg = magnifyOverlay.querySelector('.magnify-bg');
+const text = magnifyOverlay.querySelector('.magnify-text');
+
+bg.style.opacity = '1';
+text.style.opacity = '1';
+
 
   // Force browser to commit the start state
   magnifyImage.getBoundingClientRect();
