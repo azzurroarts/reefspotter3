@@ -95,6 +95,12 @@ select, input {
   background: linear-gradient(to right, #ec4899, #facc15, #3b82f6);
   border-radius: 9999px;
 }
+@media (max-width: 640px) {
+  .progress-bar {
+    max-width: calc(100% - 3.5rem);
+  }
+}
+
 
 #progress-text {
   position: absolute;
