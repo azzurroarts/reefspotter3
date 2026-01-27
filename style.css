@@ -134,7 +134,8 @@ select, input {
   width: 100%;
   aspect-ratio: 1 / 1; /* square images, large */
   object-fit: cover;
-  
+   position: relative;
+  z-index: 1; /* ABOVE tint */
 }
 
 /* Placeholder images should be smaller + centred */
@@ -171,6 +172,8 @@ select, input {
   padding: 0.5rem;
   gap: 0.25rem;
   flex-grow: 1; /* take remaining space below image */
+  position: relative;
+  z-index: 2; /* TOP layer */
 }
 
 /* Name and scientific name */
@@ -514,6 +517,7 @@ mark {
   opacity: 0;
   pointer-events: none;
   transition: opacity 200ms ease;
+  z-index: 0; /* LOWEST: tint sits underneath everything */
 }
 
 .species-card.unlocked:hover::before {
