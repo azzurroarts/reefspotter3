@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+  /*scroll state locker*/
+  let scrollY = 0;
+
+function lockScroll() {
+  scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = '100%';
+}
+
+function unlockScroll() {
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, scrollY);
+}
+
+ /*MASCOT*/
   // ---- Mascot randomiser ----
 const mascotImages = [
   'horseshoeleatherjacketmale.png',
@@ -12,6 +30,8 @@ if (mascotEl) {
   const pick = mascotImages[Math.floor(Math.random() * mascotImages.length)];
   mascotEl.src = `/reefspotter3/images/${pick}`;
 }
+
+  /*DOMINANT COLOUR EXTRACTOR */
 function extractDominantColour(img) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -573,6 +593,8 @@ imageWrap.getBoundingClientRect();
 imageWrap.classList.remove('reset-visuals');
 
   magnifyOverlay.classList.add("is-visible");
+    lockScroll();
+
   magnifyOverlay.setAttribute("aria-hidden", "false");
   // ---- GLITTER EMITTER ----
 const glitterLayer = magnifyOverlay.querySelector('.magnify-glitter-layer');
@@ -700,6 +722,8 @@ magnifyOverlay.addEventListener("click", () => {
   setTimeout(() => {
     magnifyOverlay.classList.remove("is-visible");
     magnifyOverlay.setAttribute("aria-hidden", "true");
+    unlockScroll();
+
 
     // HARD reset to prevent ghosting
     magnifyImage.src = "";
