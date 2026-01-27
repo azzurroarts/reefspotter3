@@ -374,12 +374,9 @@ window.addEventListener('scroll', updateActiveLetter, { passive: true });
   searchInput.addEventListener('input', renderSpecies);
   filterSelect.addEventListener('change', renderSpecies);
 
-  loadCSV();
-});
 /* =========================
    MAGNIFY MODE — STEP 2
-   Click detection + data wiring
-   (NO animation)
+   Event delegation (correct)
    ========================= */
 
 const magnifyOverlay = document.getElementById("magnify-overlay");
@@ -389,42 +386,37 @@ const magnifyScientific = magnifyOverlay.querySelector(".magnify-scientific");
 const magnifyDescription = magnifyOverlay.querySelector(".magnify-description");
 const magnifyLore = magnifyOverlay.querySelector(".magnify-lore");
 
-// attach listeners AFTER cards exist
-function initMagnifyMode() {
-  const unlockedCards = document.querySelectorAll(".species-card.unlocked");
+// Handle clicks on unlocked cards (even if created later)
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".species-card.unlocked");
+  if (!card) return;
 
-  unlockedCards.forEach(card => {
-    card.addEventListener("click", () => {
-      const img = card.querySelector("img");
-      const common = card.querySelector("h2");
-      const scientific = card.querySelector(".scientific-name");
-      const description = card.querySelector(".description");
+  const img = card.querySelector("img");
+  const common = card.querySelector("h2");
+  const scientific = card.querySelector(".scientific-name");
+  const description = card.querySelector(".description");
 
-      // Populate overlay
-      magnifyImage.src = img.src;
-      magnifyImage.alt = img.alt || "";
+  // Populate overlay
+  magnifyImage.src = img?.src || "";
+  magnifyImage.alt = img?.alt || "";
 
-      magnifyCommon.textContent = common?.textContent || "";
-      magnifyScientific.textContent = scientific?.textContent || "";
-      magnifyDescription.textContent = description?.textContent || "";
+  magnifyCommon.textContent = common?.textContent || "";
+  magnifyScientific.textContent = scientific?.textContent || "";
+  magnifyDescription.textContent = description?.textContent || "";
+  magnifyLore.textContent = ""; // later CSV column
 
-      // Lore will come from CSV in STEP 6
-      magnifyLore.textContent = "";
+  // Show overlay instantly
+  magnifyOverlay.classList.add("is-visible");
+  magnifyOverlay.setAttribute("aria-hidden", "false");
+});
 
-      // Show overlay (instant, no animation)
-      magnifyOverlay.classList.add("is-visible");
-      magnifyOverlay.setAttribute("aria-hidden", "false");
-    });
-  });
-}
-
-// click anywhere on overlay to close
+// Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
   magnifyOverlay.classList.remove("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "true");
 });
 
-// IMPORTANT: call this AFTER your cards are rendered
-// If you already have a render() or loadCSV() callback,
-// put this call at the end of that instead.
-initMagnifyMode();
+  loadCSV();
+});
+
+
