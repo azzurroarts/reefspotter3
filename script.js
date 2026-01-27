@@ -270,6 +270,16 @@ const filename = isIllustrated
       if (isIllustrated) {
   img.src = `/reefspotter3/images/${filename}`;
   card.classList.add('unlocked');
+        img.addEventListener('load', () => {
+  try {
+    const tint = extractDominantColour(img);
+    const rgba = tint.replace('rgb(', 'rgba(').replace(')', ', 0.35)');
+    card.style.setProperty('--card-tint', rgba);
+  } catch (e) {
+    // fail silently — never break rendering
+  }
+});
+
 
 } else if (isFunded) {
   img.src = `/reefspotter3/images/comingsoon.png`;
