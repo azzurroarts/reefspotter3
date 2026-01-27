@@ -194,6 +194,13 @@ if (isIllustrated) {
   img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
   card.classList.add('locked');
 }
+// 👉 CLICK TO FUND (ONLY FOR LOCKED CARDS)
+if (!isIllustrated) {
+  card.addEventListener('click', () => {
+    navigator.clipboard.writeText(name);
+    window.open('https://ko-fi.com/azzurrobatic', '_blank');
+  });
+}
 
 
 
