@@ -434,38 +434,6 @@ mark {
   opacity: 0.9;
 }
 
-/* ---- GLITTER PARTICLES (real sparkles) ---- */
-.magnify-image-wrap::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  z-index: 1;
-  opacity: 0;
-  background: white;
-
-  /* MANY sparkles via box-shadow */
-  box-shadow:
-    -120px -80px rgba(255,255,255,0.9),
-    -60px -140px rgba(255,255,255,0.8),
-    40px -110px rgba(255,255,255,0.85),
-    120px -60px rgba(255,255,255,0.9),
-    150px 20px rgba(255,255,255,0.75),
-    90px 120px rgba(255,255,255,0.8),
-    -40px 140px rgba(255,255,255,0.9),
-    -140px 60px rgba(255,255,255,0.75),
-    -160px -10px rgba(255,255,255,0.85),
-    0px 170px rgba(255,255,255,0.9);
-
-  animation: glitter-float 4.5s ease-in-out infinite;
-}
-
-.magnify-overlay.is-visible .magnify-image-wrap::after {
-  opacity: 1;
-}
 
 /* fish stays clean and above everything */
 .magnify-image {
@@ -480,13 +448,6 @@ mark {
   100% { transform: scale(0.95) rotate(360deg); }
 }
 
-@keyframes glitter-float {
-  0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-  20%  { opacity: 1; }
-  50%  { transform: translate(-50%, -50%) scale(1.15); }
-  80%  { opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-}
 /* =========================
    MAGNIFY MODE — GLITTER EMITTER
    ========================= */
