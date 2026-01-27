@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // ---- Mascot randomiser ----
+const mascotImages = [
+  'horseshoeleatherjacketmale.png',
+  'sixbarwrasse.png',
+  'weedyseadragon.png'
+];
+
+const mascotEl = document.getElementById('mascot-fish');
+
+if (mascotEl) {
+  const pick = mascotImages[Math.floor(Math.random() * mascotImages.length)];
+  mascotEl.src = `/reefspotter3/images/${pick}`;
+}
+
   const PLACEHOLDERS = [
   'placeholder1.png',
   'placeholder2.png',
