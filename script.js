@@ -586,21 +586,25 @@ text.style.opacity = '1';
 });
 
 // Click anywhere on overlay to close
+// Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
   magnifyOverlay.classList.remove("is-visible");
   magnifyOverlay.setAttribute("aria-hidden", "true");
 
+  // stop glitter emitter
   magnifyOverlay._glitterActive = false;
-clearInterval(magnifyOverlay._glitterInterval);
-bg.style.removeProperty('--bg-colour');
+  clearInterval(magnifyOverlay._glitterInterval);
 
-  
-  // reset visuals to prevent leftovers on fast reopen
+  // reset background colour + opacity
+  const bg = magnifyOverlay.querySelector('.magnify-bg');
+  bg.style.opacity = '0';
+  bg.style.removeProperty('--bg-colour');
+
+  // reset text + image so nothing flashes on reopen
   magnifyImage.style.opacity = '0';
-  magnifyOverlay.querySelector('.magnify-bg').style.opacity = '0';
   magnifyOverlay.querySelector('.magnify-text').style.opacity = '0';
-  
 });
+
 
 
   loadCSV();
