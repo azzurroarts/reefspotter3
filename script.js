@@ -12,6 +12,67 @@ if (mascotEl) {
   const pick = mascotImages[Math.floor(Math.random() * mascotImages.length)];
   mascotEl.src = `/reefspotter3/images/${pick}`;
 }
+function extractDominantColour(img) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const size = 40;
+  canvas.width = size;
+  canvas.height = size;
+
+  ctx.drawImage(img, 0, 0, size, size);
+
+  const data = ctx.getImageData(0, 0, size, size).data;
+
+  let r = 0, g = 0, b = 0, count = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const rr = data[i];
+    const gg = data[i + 1];
+    const bb = data[i + 2];
+
+    const max = Math.max(rr, gg, bb);
+    const min = Math.min(rr, gg, bb);
+    const saturation = max - min;
+
+    /* ---- FILTERS ---- */
+
+    // ignore near-black
+    if (max < 45) continue;
+
+    // ignore near-white
+    if (min > 215) continue;
+
+    // ignore greys / low saturation
+    if (saturation < 30) continue;
+
+    // ignore dark browns / muddy oranges
+    // (red dominant, low blue, mid green)
+    if (
+      rr > gg &&
+      gg > bb &&
+      rr - bb > 60 &&
+      max < 160
+    ) continue;
+
+    r += rr;
+    g += gg;
+    b += bb;
+    count++;
+  }
+
+  if (!count) {
+    // fallback: soft neutral glow
+    return 'rgba(255,255,255,0.9)';
+  }
+
+  r = Math.round(r / count);
+  g = Math.round(g / count);
+  b = Math.round(b / count);
+
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 
   const PLACEHOLDERS = [
   'placeholder1.png',
@@ -439,6 +500,10 @@ imageWrap.classList.remove('reset-visuals');
 const glitterLayer = magnifyOverlay.querySelector('.magnify-glitter-layer');
 glitterLayer.innerHTML = '';
 
+  // extract dominant species colour for glitter
+const dominantColour = extractDominantColour(img);
+glitterLayer.style.setProperty('--sparkle-colour', dominantColour);
+
 const sparkleColour =
   magnifyOverlay.querySelector('.magnify-bg')?.style.backgroundColor ||
   'rgba(255,255,255,0.9)';
@@ -459,6 +524,8 @@ const brightness = 0.7 + Math.random() * 0.6; // glow variance
 s.style.width = `${size}px`;
 s.style.height = `${size}px`;
 s.style.opacity = brightness;
+  
+s.style.filter = `blur(${Math.random() * 0.6}px)`;
 
 
   const angle = Math.random() * Math.PI * 2;
