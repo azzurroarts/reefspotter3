@@ -498,3 +498,28 @@ mark {
   z-index: 3;
 }
 
+/* =========================
+   UNLOCKED CARD — HOVER TINT
+   ========================= */
+
+.species-card.unlocked {
+  position: relative;
+  transition:
+    box-shadow 220ms ease,
+    transform 180ms ease,
+    background-color 220ms ease;
+}
+
+.species-card.unlocked:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--card-tint, transparent) 18%,
+    white
+  );
+
+  box-shadow:
+    0 0 0 2px var(--card-tint, rgba(255,255,255,0.4)),
+    0 8px 28px rgba(0,0,0,0.25);
+}
+
+
