@@ -84,7 +84,7 @@ select, input {
 /*prog bar falls short of wonky mobile vertical alphabet*/
 @media (max-width: 640px) {
   .progress-container {
-    padding-right: 3.5rem; /* space for alphabet */
+    padding-right: 10rem; /* space for alphabet */
   }
 }
 
@@ -97,7 +97,7 @@ select, input {
 }
 @media (max-width: 640px) {
   .progress-bar {
-    max-width: calc(100% - 3.5rem);
+    max-width: calc(100% - 10rem);
   }
 }
 
