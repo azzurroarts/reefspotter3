@@ -513,11 +513,7 @@ bg.style.setProperty(
 );
 
 
-const sparkleColour =
-  magnifyOverlay.querySelector('.magnify-bg')?.style.backgroundColor ||
-  'rgba(255,255,255,0.9)';
 
-glitterLayer.style.setProperty('--sparkle-colour', sparkleColour);
 
 let glitterActive = true;
 magnifyOverlay._glitterActive = true;
@@ -557,7 +553,7 @@ s.style.filter = `blur(${Math.random() * 0.6}px)`;
 magnifyOverlay._glitterInterval = setInterval(spawnSparkle, 20);
 
   // Explicitly reset bg + text every time (inline styles override CSS)
-const bg = magnifyOverlay.querySelector('.magnify-bg');
+
 const text = magnifyOverlay.querySelector('.magnify-text');
 
 bg.style.opacity = '1';
