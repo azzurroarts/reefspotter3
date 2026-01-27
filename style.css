@@ -220,11 +220,19 @@ select, input {
 
 @media (max-width: 640px) {
   .vertical-alphabet {
-    top: auto;                /* stop top anchoring */
-    bottom: 1rem;             /* anchor to bottom */
-    height: calc(100vh - 220px); /* header-safe zone */
-    justify-content: flex-end; /* letters grow upward */
-    transform: none;          /* 🔥 CRITICAL: kill translateY */
+    position: fixed;
+    top: auto !important;
+    bottom: 1.25rem;
+    right: 0.75rem;
+
+    height: calc(100vh - 160px); /* header-safe zone */
+    max-height: 70vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    transform: none !important;
   }
 }
 
