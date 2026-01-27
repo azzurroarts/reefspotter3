@@ -187,13 +187,20 @@ const filename = isIllustrated
 
           const img = document.createElement('img');
 
-if (isIllustrated) {
+      /*IMAGE SWITCH*/
+      if (isIllustrated) {
   img.src = `/reefspotter3/images/${filename}`;
   card.classList.add('unlocked');
+
+} else if (isFunded) {
+  img.src = `/reefspotter3/images/comingsoon.png`;
+  card.classList.add('funded');
+
 } else {
   img.src = `/reefspotter3/images/${getRandomPlaceholder()}`;
   card.classList.add('locked');
 }
+
 // 👉 CLICK TO FUND (ONLY FOR LOCKED CARDS)
 if (!isIllustrated) {
   card.addEventListener('click', () => {
