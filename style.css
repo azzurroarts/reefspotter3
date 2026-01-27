@@ -384,3 +384,27 @@ mark {
   opacity: 1;
 }
 
+/* =========================
+   MAGNIFY MODE — STEP 4
+   Expansion animation
+   ========================= */
+
+.magnify-image {
+  transition:
+    top 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.magnify-bg {
+  transition: opacity 500ms ease;
+}
+
+.magnify-text {
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+}
