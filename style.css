@@ -220,12 +220,14 @@ select, input {
 
 @media (max-width: 640px) {
   .vertical-alphabet {
- top: 200px;              /* safely below header */
-    bottom: auto;            /* stop stretching */
-    height: 60vh;            /* 👈 constrain height */
-    justify-content: center; /* keep letters centred */
+    top: auto;                /* stop top anchoring */
+    bottom: 1rem;             /* anchor to bottom */
+    height: calc(100vh - 220px); /* header-safe zone */
+    justify-content: flex-end; /* letters grow upward */
+    transform: none;          /* 🔥 CRITICAL: kill translateY */
   }
 }
+
 
 /* Base state */
 .alphabet-letter {
@@ -353,6 +355,8 @@ mark {
 .magnify-common {
   margin: 0 0 8px;
   font-size: clamp(28px, 3.2vw, 44px);
+  color: rgba(255,255,255,0.95);
+
 }
 
 .magnify-scientific {
