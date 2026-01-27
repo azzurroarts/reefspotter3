@@ -73,6 +73,35 @@ function extractDominantColour(img) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+  function boostColour(rgb) {
+  const [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+  // convert to HSL
+  const rN = r / 255, gN = g / 255, bN = b / 255;
+  const max = Math.max(rN, gN, bN);
+  const min = Math.min(rN, gN, bN);
+  let h, s, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rN: h = (gN - bN) / d + (gN < bN ? 6 : 0); break;
+      case gN: h = (bN - rN) / d + 2; break;
+      case bN: h = (rN - gN) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  // BOOST IT (this is the magic)
+  s = Math.min(1, s * 1.35);   // more saturation
+  l = Math.min(1, l + 0.18);   // lighter
+
+  return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+}
+
 
   const PLACEHOLDERS = [
   'placeholder1.png',
