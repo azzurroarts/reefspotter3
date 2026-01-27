@@ -517,14 +517,14 @@ mark {
 }
 
 .species-card.unlocked:hover::before {
-  opacity: 0.1; /* light, bright wash */
+  opacity: 0.6; /* light, bright wash */
 }
 
 .species-card.unlocked:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--card-tint) 60%, transparent),
-    0 12px 32px color-mix(in srgb, var(--card-tint) 40%, rgba(0,0,0,0.35));
+    0 0 0 2px color-mix(in srgb, var(--card-tint) 85%, transparent),
+    0 12px 32px color-mix(in srgb, var(--card-tint) 65%, rgba(0,0,0,0.35));
 }
 
 
