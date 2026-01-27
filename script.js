@@ -542,10 +542,12 @@ magnifyImage.alt = img?.alt || "";
     // --- ZOOM FROM CARD → CENTRE (no Step 3 precision needed) ---
 
   // Reset any old state so you don't see the previous fish flash
+  
   magnifyImage.style.transition = 'none';
   magnifyImage.style.opacity = '0';
 
   // Start position = the clicked card image
+  magnifyImage.onload = () => {
   const rect = img.getBoundingClientRect();
 
   magnifyImage.style.top = `${rect.top}px`;
@@ -554,6 +556,7 @@ magnifyImage.alt = img?.alt || "";
   magnifyImage.style.height = `${rect.height}px`;
   magnifyImage.style.transform = 'none';
 
+    
   // Show overlay AFTER positioning
   const imageWrap = magnifyOverlay.querySelector('.magnify-image-wrap');
 
@@ -658,6 +661,7 @@ text.style.opacity = '1';
     magnifyImage.style.height = `${size}px`;
     magnifyImage.style.transform = 'translate(-50%, -50%)';
   });
+  };
 
   // --- END ZOOM ---
 });
