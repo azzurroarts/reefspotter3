@@ -162,16 +162,20 @@ function getRandomPlaceholder() {
       const desc = pick(f, ['description', 'desc', 'blurb'], '');
 
       // image filename (not URL)
-      const rawFilename = pick(f, ['image_url'], '');
+const rawFilename = pick(f, ['image_url'], '');
+
+const raw = (rawFilename || '').trim();
+
+const isFunded = raw === 'FUNDED';
 
 const isIllustrated =
-  typeof rawFilename === 'string' &&
-  rawFilename.length > 0 &&
-  rawFilename.toLowerCase() !== 'undefined' &&
-  rawFilename.toLowerCase() !== 'null';
+  raw &&
+  raw !== 'UNDEFINED' &&
+  raw !== 'NULL' &&
+  !isFunded;
 
 const filename = isIllustrated
-  ? rawFilename
+  ? raw
       .normalize('NFKD')
       .replace(/[\u0000-\u001F\u007F-\u009F\u00A0]/g, '')
       .replace(/\s+/g, '')
