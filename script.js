@@ -522,6 +522,15 @@ function spawnSparkle() {
   if (!magnifyOverlay._glitterActive) return;
 
   const s = document.createElement('span');
+  // mix white glitter with species colour
+const useWhite = Math.random() < 0.35; // 35% white sparkles
+
+if (useWhite) {
+  s.style.background = 'rgba(255,255,255,0.95)';
+} else {
+  s.style.background = 'var(--sparkle-colour)';
+}
+
   // subtle variance per sparkle
 const size = 2 + Math.random() * 3; // 2–5px
 const brightness = 0.7 + Math.random() * 0.6; // glow variance
