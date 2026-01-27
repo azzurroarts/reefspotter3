@@ -667,24 +667,34 @@ text.style.opacity = '1';
 });
 
 // Click anywhere on overlay to close
-// Click anywhere on overlay to close
 magnifyOverlay.addEventListener("click", () => {
-  magnifyOverlay.classList.remove("is-visible");
-  magnifyOverlay.setAttribute("aria-hidden", "true");
-
-  // stop glitter emitter
+  // stop glitter emitter immediately
   magnifyOverlay._glitterActive = false;
   clearInterval(magnifyOverlay._glitterInterval);
 
-  // reset background colour + opacity
   const bg = magnifyOverlay.querySelector('.magnify-bg');
-  bg.style.opacity = '0';
-  bg.style.removeProperty('--bg-colour');
+  const text = magnifyOverlay.querySelector('.magnify-text');
 
-  // reset text + image so nothing flashes on reopen
+  // animate OUT first (do NOT hide yet)
   magnifyImage.style.opacity = '0';
-  magnifyOverlay.querySelector('.magnify-text').style.opacity = '0';
+  magnifyImage.style.transform = 'translate(-50%, -50%) scale(0.88)';
+
+  bg.style.opacity = '0';
+  text.style.opacity = '0';
+
+  // AFTER animation completes, fully hide + hard reset
+  setTimeout(() => {
+    magnifyOverlay.classList.remove("is-visible");
+    magnifyOverlay.setAttribute("aria-hidden", "true");
+
+    // CRITICAL: clear image src so it can never flash
+    magnifyImage.src = "";
+
+    // clean background colour for next open
+    bg.style.removeProperty('--bg-colour');
+  }, 260); // must match / slightly exceed your CSS fade timing
 });
+
 
 
 
