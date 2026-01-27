@@ -570,7 +570,7 @@ const bg = magnifyOverlay.querySelector('.magnify-bg');
 // soften + add alpha so it never overwhelms
 bg.style.setProperty(
   '--bg-colour',
-  dominantColour.replace('rgb', 'rgba').replace(')', ', 0.35)')
+  dominantColour.replace('rgb', 'rgba').replace(')', ', 0.65)')
 );
 
 
