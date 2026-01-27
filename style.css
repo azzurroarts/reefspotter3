@@ -487,4 +487,46 @@ mark {
   80%  { opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
 }
+/* =========================
+   MAGNIFY MODE — GLITTER EMITTER
+   ========================= */
+
+.magnify-glitter-layer {
+  position: absolute;
+  inset: -30%;
+  z-index: 1; /* behind fish, above shimmer */
+  pointer-events: none;
+  overflow: visible;
+}
+
+.magnify-glitter-layer span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sparkle-colour, rgba(255,255,255,0.9));
+  opacity: 0;
+  filter: blur(0.3px);
+  animation: glitter-fly 2.6s linear forwards;
+}
+
+@keyframes glitter-fly {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* keep fish above everything */
+.magnify-image {
+  position: relative;
+  z-index: 3;
+}
 
