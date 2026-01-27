@@ -396,16 +396,35 @@ mark {
     transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 200ms ease;
 }
+
 /* =========================
    MAGNIFY MODE — SHIMMER AURA (FIXED)
    ========================= */
+/* Animation reset helper */
+.magnify-image-wrap.reset-visuals::before,
+.magnify-image-wrap.reset-visuals::after {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
 
 .magnify-image-wrap {
   pointer-events: none;
+  position: absolute;
+  inset: 0;
 }
+
+/* fish stays on top */
+.magnify-image {
+  position: relative;
+  z-index: 2;
+}
+
 
 .magnify-image-wrap::before,
 .magnify-image-wrap::after {
+    z-index: 1;
+
   content: "";
   position: absolute;
   inset: -18%;
@@ -437,3 +456,59 @@ mark {
   50%  { transform: scale(1.04) rotate(180deg); }
   100% { transform: scale(0.95) rotate(360deg); }
 }
+
+/* =========================
+   MAGNIFY MODE — GLITTER PARTICLES
+   ========================= */
+
+.magnify-image-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.9) 0.6px, transparent 1.4px),
+    radial-gradient(circle, rgba(255,255,255,0.7) 0.6px, transparent 1.6px),
+    radial-gradient(circle, rgba(255,255,255,0.8) 0.5px, transparent 1.3px);
+
+  background-size:
+    120px 120px,
+    160px 160px,
+    90px 90px;
+
+  background-position:
+    20% 30%,
+    70% 60%,
+    40% 80%;
+
+  opacity: 0;
+  animation: glitter-burst 3.8s ease-in-out infinite;
+}
+
+.magnify-overlay.is-visible .magnify-image-wrap::after {
+  opacity: 0.85;
+}
+
+@keyframes glitter-burst {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
