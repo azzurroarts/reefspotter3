@@ -497,29 +497,34 @@ mark {
   position: relative;
   z-index: 3;
 }
-
 /* =========================
-   UNLOCKED CARD — HOVER TINT
+   CARD HOVER — SPECIES TINT
    ========================= */
 
 .species-card.unlocked {
   position: relative;
-  transition:
-    box-shadow 220ms ease,
-    transform 180ms ease,
-    background-color 220ms ease;
+  overflow: hidden;
+}
+
+.species-card.unlocked::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--card-tint);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.species-card.unlocked:hover::before {
+  opacity: 0.1; /* light, bright wash */
 }
 
 .species-card.unlocked:hover {
-  background-color: color-mix(
-    in srgb,
-    var(--card-tint, transparent) 18%,
-    white
-  );
-
+  transform: translateY(-2px);
   box-shadow:
-    0 0 0 2px var(--card-tint, rgba(255,255,255,0.4)),
-    0 8px 28px rgba(0,0,0,0.25);
+    0 0 0 2px color-mix(in srgb, var(--card-tint) 60%, transparent),
+    0 12px 32px color-mix(in srgb, var(--card-tint) 40%, rgba(0,0,0,0.35));
 }
 
 
