@@ -13,7 +13,9 @@ function unlockScroll() {
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.width = '';
-  window.scrollTo(0, scrollY);
+    requestAnimationFrame(() => {
+    window.scrollTo(0, scrollY);
+  });
 }
 
  /*MASCOT*/
@@ -529,9 +531,14 @@ const magnifyDescription = magnifyOverlay.querySelector(".magnify-description");
 const magnifyLore = magnifyOverlay.querySelector(".magnify-lore");
 
 // Handle clicks on unlocked cards (even if created later)
+
 document.addEventListener("click", (e) => {
   const card = e.target.closest(".species-card.unlocked");
   if (!card) return;
+
+  e.preventDefault();
+  e.stopPropagation(); // ⬅️ ADD THIS
+
 
   const img = card.querySelector("img");
   const common = card.querySelector("h2");
@@ -692,7 +699,10 @@ text.style.opacity = '1';
 });
 
 // Click anywhere on overlay to close
-magnifyOverlay.addEventListener("click", () => {
+magnifyOverlay.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation(); // ⬅️ ADD THIS
+
   // stop glitter
   magnifyOverlay._glitterActive = false;
   clearInterval(magnifyOverlay._glitterInterval);
