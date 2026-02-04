@@ -557,4 +557,11 @@ mark {
     0 12px 32px color-mix(in srgb, var(--card-tint) 65%, rgba(0,0,0,0.35));
 }
 
+/* Funded / Coming Soon image sizing */
+.species-card.funded img {
+  object-fit: contain;
+  padding: 18%;
+  opacity: 0.85;
+}
+
 
