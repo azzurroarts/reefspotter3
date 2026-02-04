@@ -551,17 +551,26 @@ mark {
 }
 
 .species-card.unlocked:hover {
-  transform: translateY(-2px);
+  transform: translateY(-10px);
   box-shadow:
     0 0 0 2px color-mix(in srgb, var(--card-tint) 85%, transparent),
     0 12px 32px color-mix(in srgb, var(--card-tint) 65%, rgba(0,0,0,0.35));
 }
 
-/* Funded / Coming Soon image sizing */
+/* FUNDED / COMING SOON — force small, centred badge */
+.species-card.funded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .species-card.funded img {
+  width: 45% !important;
+  height: auto !important;
+  max-width: 160px;
   object-fit: contain;
-  padding: 18%;
   opacity: 0.85;
 }
+
 
 
