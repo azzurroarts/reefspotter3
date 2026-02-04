@@ -684,7 +684,12 @@ text.style.opacity = '1';
 
   // Animate to centre with numeric target (no 'min()' CSS — browsers won't animate that)
   requestAnimationFrame(() => {
-    const size = Math.min(window.innerWidth * 0.62, 560);
+   const isMobile = window.innerWidth < 640;
+
+const size = isMobile
+  ? Math.min(window.innerWidth * 0.92, 420) // BIG on mobile
+  : Math.min(window.innerWidth * 0.62, 560);
+
 
     magnifyImage.style.opacity = '1';
     magnifyImage.style.top = `${window.innerHeight / 2}px`;
